@@ -92,6 +92,4 @@ GOOGLE_BOOKS_API_KEY=your_google_books_api_key
 
 🚧 Active development — MVP in progress.
 
----
 
-_Built for readers, by a reader._
