@@ -3,6 +3,12 @@ import { users } from "../database/schema";
 
 type UserInsert = typeof users.$inferInsert;
 type User = typeof users.$inferSelect;
+type UserLogin = Pick<User, "email" | "password">;
+
+interface JWTService {
+  sign: (payload: { userId: number }) => Promise<string>;
+  verify: (token: string) => Promise<any>;
+}
 
 export class AuthController {
   static async signup({
@@ -10,10 +16,7 @@ export class AuthController {
     jwt,
   }: {
     body: UserInsert;
-    jwt: {
-      sign: (payload: object) => Promise<string>;
-      verify: (token: string) => Promise<any>;
-    };
+    jwt: JWTService;
   }): Promise<Response> {
     try {
       // Create the user
@@ -58,6 +61,59 @@ export class AuthController {
       const resp = { success: false, error: message };
 
       return new Response(JSON.stringify(resp), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async login({
+    body,
+    jwt,
+  }: {
+    body: UserLogin;
+    jwt: JWTService;
+  }): Promise<Response> {
+    try {
+      const authenticatedUser: User = await AuthService.login(
+        body.email,
+        body.password!,
+      );
+
+      const token = await jwt.sign({ userId: authenticatedUser.id });
+
+      const response = {
+        success: true,
+        data: {
+          user: {
+            id: authenticatedUser.id,
+            username: authenticatedUser.username,
+            email: authenticatedUser.email,
+            profilePicture: authenticatedUser.profilePicture,
+          },
+          token,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status = 500;
+      let message = "An error occurred while logging in";
+
+      if (
+        error?.message === "USER_NOT_FOUND" ||
+        error?.message === "INVALID_PASSWORD"
+      ) {
+        status = 401;
+        message = "Invalid email or password";
+      } else {
+        console.error("Login error:", error?.message ?? error);
+      }
+
+      return new Response(JSON.stringify({ success: false, error: message }), {
         status,
         headers: { "Content-Type": "application/json" },
       });

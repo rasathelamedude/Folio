@@ -6,32 +6,8 @@ type UserInsert = typeof users.$inferInsert;
 type User = typeof users.$inferSelect;
 
 export class AuthService {
-  static emailRegex = /\S+@\S+\.\S+/;
-
   static async signup(newUser: UserInsert): Promise<User> {
     try {
-      // Check username collision
-      const existingByUsername = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, newUser.username))
-        .execute();
-
-      if (existingByUsername.length > 0) {
-        throw new Error("USERNAME_IN_USE");
-      }
-
-      // Check email collision
-      const existingByEmail = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, newUser.email))
-        .execute();
-
-      if (existingByEmail.length > 0) {
-        throw new Error("EMAIL_IN_USE");
-      }
-
       // Hash the password
       newUser.password = await Bun.password.hash(newUser.password!);
 
