@@ -5,5 +5,6 @@ export const jwtPlugin = new Elysia().use(
   jwt({
     name: "jwt",
     secret: process.env.JWT_SECRET!,
+    exp: "7d",
   }),
 );
