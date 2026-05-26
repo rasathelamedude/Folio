@@ -2,9 +2,8 @@ import { Elysia } from "elysia";
 import { JWTPayload } from "../types/ApiResponse";
 import { jwtPlugin } from "../lib/jwt";
 
-export const authMiddleware = new Elysia()
-  .use(jwtPlugin)
-  .derive(async ({ headers, jwt, set }) => {
+export const authMiddleware = (app: Elysia) =>
+  app.use(jwtPlugin).derive(async ({ headers, jwt, set }) => {
     const authHeader = headers.authorization;
 
     if (!authHeader) {
@@ -19,12 +18,12 @@ export const authMiddleware = new Elysia()
       throw new Error("No token provided");
     }
 
-    const payload: JWTPayload = await jwt.verify(token);
+    const payload = (await jwt.verify(token)) as JWTPayload | false;
 
-    if (!payload) {
+    if (!payload || payload.userId === undefined) {
       set.status = 401;
       throw new Error("Invalid token");
     }
 
-    return { userId: payload.userId };
+    return { userId: Number(payload.userId) };
   });

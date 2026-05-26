@@ -1,9 +1,7 @@
 import { users } from "../database/schema";
 import { db } from "../database/db";
 import { eq } from "drizzle-orm";
-
-type UserInsert = typeof users.$inferInsert;
-type User = typeof users.$inferSelect;
+import { User, UserInsert, UserProfile } from "../types/User";
 
 export class AuthService {
   static async signup(newUser: UserInsert): Promise<User> {
@@ -62,6 +60,28 @@ export class AuthService {
       }
 
       return user as User;
+    } catch (error: any) {
+      console.error(error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async getUserById(userId: number): Promise<UserProfile | null> {
+    try {
+      const user: UserProfile[] = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          username: users.username,
+          email: users.email,
+          googleId: users.googleId,
+          profilePicture: users.profilePicture,
+        })
+        .from(users)
+        .where(eq(users.id, userId))
+        .execute();
+
+      return user.length > 0 ? (user[0] as UserProfile) : null;
     } catch (error: any) {
       console.error(error?.message ?? error);
       throw error;

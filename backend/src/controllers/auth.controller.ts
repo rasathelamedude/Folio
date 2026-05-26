@@ -1,9 +1,5 @@
 import { AuthService } from "../services/auth.service";
-import { users } from "../database/schema";
-
-type UserInsert = typeof users.$inferInsert;
-type User = typeof users.$inferSelect;
-type UserLogin = Pick<User, "email" | "password">;
+import { User, UserInsert, UserProfile, UserLogin } from "../types/User";
 
 interface JWTService {
   sign: (payload: { userId: number }) => Promise<string>;
@@ -117,6 +113,39 @@ export class AuthController {
         status,
         headers: { "Content-Type": "application/json" },
       });
+    }
+  }
+
+  static async getProfile({ userId }: { userId: number }): Promise<Response> {
+    try {
+      console.log("UserID is: " + userId);
+      const user: UserProfile | null = await AuthService.getUserById(userId);
+
+      if (!user) {
+        return new Response(
+          JSON.stringify({ success: false, error: "User not found" }),
+          {
+            status: 404,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      return new Response(JSON.stringify({ success: true, data: { user } }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "An error occurred while fetching the profile",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
   }
 }
