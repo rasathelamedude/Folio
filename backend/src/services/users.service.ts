@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../database/db";
 import { users } from "../database/schema";
-import { UserAccountUpdate, User } from "../types/User";
+import { UserAccountUpdate, User, UserProfile } from "../types/User";
 
 export class UserService {
   static async deleteAccount({ userId }: { userId: number }): Promise<void> {
@@ -75,6 +75,25 @@ export class UserService {
       }
 
       console.error("Update account error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async getUserByUsername(username: string): Promise<UserProfile> {
+    try {
+      const user = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, username))
+        .execute();
+
+      if (user.length === 0) {
+        throw new Error("USER_NOT_FOUND");
+      }
+
+      return user[0] as UserProfile;
+    } catch (error: any) {
+      console.error("Get user by username error: ", error?.message ?? error);
       throw error;
     }
   }

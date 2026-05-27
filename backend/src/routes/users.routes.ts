@@ -7,6 +7,14 @@ export const userRoutes = new Elysia()
   .use(jwtPlugin)
   .group("/api/v1/users", (app) =>
     app
+      .get("/", async ({ query }) =>
+        UserController.getUserByUsername(query.username),
+        {
+          query: t.Object({
+            username: t.String(),
+          }),
+        },
+      )
       .use(authMiddleware)
       .delete("/account", async ({ userId }) =>
         UserController.deleteAccount({ userId }),

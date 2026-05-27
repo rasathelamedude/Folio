@@ -1,6 +1,6 @@
 import { JWTService } from "../lib/jwt";
 import { UserService } from "../services/users.service";
-import { UserAccountUpdate } from "../types/User";
+import { UserAccountUpdate, UserProfile } from "../types/User";
 
 export class UserController {
   static async deleteAccount({
@@ -81,6 +81,42 @@ export class UserController {
       } else if (error?.message === "EMAIL_IN_USE") {
         status = 409;
         message = "Email already in use";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async getUserByUsername(username: string): Promise<Response> {
+    try {
+      const user: UserProfile = await UserService.getUserByUsername(username);
+
+      const response = {
+        success: true,
+        data: {
+          user,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status = 500;
+      let message = "An error occurred while fetching the user";
+
+      if (error?.message === "USER_NOT_FOUND") {
+        status = 404;
+        message = "User not found";
       }
 
       const response = {
