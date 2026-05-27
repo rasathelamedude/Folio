@@ -1,10 +1,6 @@
 import { AuthService } from "../services/auth.service";
 import { User, UserInsert, UserProfile, UserLogin } from "../types/User";
-
-interface JWTService {
-  sign: (payload: { userId: number }) => Promise<string>;
-  verify: (token: string) => Promise<any>;
-}
+import { JWTService } from "../lib/jwt";
 
 export class AuthController {
   static async signup({
