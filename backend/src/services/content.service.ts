@@ -198,4 +198,54 @@ export class ContentService {
       throw error;
     }
   }
+
+  static async editPost(
+    postId: number,
+    userId: number,
+    data: { content?: string; bookId?: number },
+  ): Promise<Post> {
+    try {
+      // Verify the post exists
+      const postToEdit: Post[] = await db
+        .select()
+        .from(posts)
+        .where(eq(posts.id, postId))
+        .execute();
+
+      if (postToEdit.length === 0) {
+        throw new Error("POST_NOT_FOUND");
+      }
+
+      // Verify user owns the post
+      if (postToEdit[0].userId !== userId) {
+        throw new Error("UNAUTHORIZED");
+      }
+
+      // Prepare update data (only include provided fields)
+      const updateData: Record<string, string | number> = {};
+      if (data.content !== undefined) {
+        updateData.content = data.content;
+      }
+      if (data.bookId !== undefined) {
+        updateData.bookId = data.bookId;
+      }
+
+      // Update the post
+      const updatedPost = await db
+        .update(posts)
+        .set(updateData)
+        .where(eq(posts.id, postId))
+        .returning()
+        .execute();
+
+      if (updatedPost.length === 0) {
+        throw new Error("POST_UPDATE_FAILED");
+      }
+
+      return updatedPost[0] as Post;
+    } catch (error: any) {
+      console.error("Edit post error:", error?.message ?? error);
+      throw error;
+    }
+  }
 }

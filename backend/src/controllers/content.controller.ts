@@ -247,4 +247,53 @@ export class ContentController {
       });
     }
   }
+
+  static async editPost(
+    postId: number,
+    data: { content?: string; bookId?: number },
+    userId: number,
+  ): Promise<Response> {
+    try {
+      const updatedPost: Post = await ContentService.editPost(
+        postId,
+        userId,
+        data,
+      );
+
+      const response = {
+        success: true,
+        data: {
+          post: updatedPost,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while editing the post";
+
+      if (error?.message === "POST_NOT_FOUND") {
+        status = 404;
+        message = "Post not found";
+      } else if (error?.message === "UNAUTHORIZED") {
+        status = 403;
+        message = "You do not have permission to edit this post";
+      } else if (error?.message === "POST_UPDATE_FAILED") {
+        message = "Failed to update the post";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
 }

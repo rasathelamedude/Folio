@@ -66,5 +66,24 @@ export const contentRoutes = new Elysia()
             content: t.String({ minLength: 1 }),
           }),
         },
+      )
+      .patch(
+        "/posts/:postID",
+        async ({ params, body, userId }) =>
+          ContentController.editPost(params.postID, body, userId),
+        {
+          params: t.Object({
+            postID: t.Numeric(),
+          }),
+          body: t.Object(
+            {
+              content: t.Optional(t.String({ minLength: 1 })),
+              bookId: t.Optional(t.Numeric()),
+            },
+            {
+              minProperties: 1,
+            },
+          ),
+        },
       ),
   );
