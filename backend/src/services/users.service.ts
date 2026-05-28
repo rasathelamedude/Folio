@@ -1,9 +1,25 @@
 import { eq } from "drizzle-orm";
 import { db } from "../database/db";
-import { users } from "../database/schema";
-import { UserAccountUpdate, User, UserProfile } from "../types/User";
+import { users, follows } from "../database/schema";
+import {
+  UserAccountUpdate,
+  User,
+  UserProfile,
+  Follower,
+  Following,
+} from "../types/User";
 
 export class UserService {
+  private static isUserExists = async (userId: number): Promise<boolean> => {
+    const user = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, userId))
+      .execute();
+
+    return user.length > 0;
+  };
+
   static async deleteAccount({ userId }: { userId: number }): Promise<void> {
     try {
       const deletedUser = await db
@@ -94,6 +110,58 @@ export class UserService {
       return user[0] as UserProfile;
     } catch (error: any) {
       console.error("Get user by username error: ", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async getUserFollowers(userId: number): Promise<Follower[]> {
+    try {
+      // Check if user exists
+      if (!this.isUserExists(userId)) {
+        throw new Error("USER_NOT_FOUND");
+      }
+
+      const followers = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          username: users.username,
+          profilePicture: users.profilePicture,
+        })
+        .from(follows)
+        .innerJoin(users, eq(follows.followerId, users.id))
+        .where(eq(follows.followedId, userId))
+        .execute();
+
+      return followers as Follower[];
+    } catch (error: any) {
+      console.error("Get user followers error: ", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async getUserFollowings(userId: number): Promise<Following[]> {
+    try {
+      // Check if user exists
+      if (!this.isUserExists(userId)) {
+        throw new Error("USER_NOT_FOUND");
+      }
+
+      const followings = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          username: users.username,
+          profilePicture: users.profilePicture,
+        })
+        .from(follows)
+        .innerJoin(users, eq(follows.followedId, users.id))
+        .where(eq(follows.followerId, userId))
+        .execute();
+
+      return followings as Following[];
+    } catch (error: any) {
+      console.error("Get user followings error: ", error?.message ?? error);
       throw error;
     }
   }

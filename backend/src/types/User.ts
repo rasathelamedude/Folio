@@ -7,3 +7,11 @@ export type UserLogin = Pick<User, "email" | "password">;
 export type UserAccountUpdate = Partial<
   Pick<User, "name" | "username" | "profilePicture" | "email">
 >;
+
+export type SimpleUser = Pick<
+  User,
+  "id" | "name" | "username" | "profilePicture"
+>;
+
+export type Follower = SimpleUser;
+export type Following = SimpleUser;

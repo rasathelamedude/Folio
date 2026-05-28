@@ -7,11 +7,30 @@ export const userRoutes = new Elysia()
   .use(jwtPlugin)
   .group("/api/v1/users", (app) =>
     app
-      .get("/", async ({ query }) =>
-        UserController.getUserByUsername(query.username),
+      .get(
+        "/",
+        async ({ query }) => UserController.getUserByUsername(query.username),
         {
           query: t.Object({
             username: t.String(),
+          }),
+        },
+      )
+      .get(
+        "/:userId/followers",
+        async ({ params }) => UserController.getUserFollowers(params.userId),
+        {
+          params: t.Object({
+            userId: t.Numeric(),
+          }),
+        },
+      )
+      .get(
+        "/:userId/followings",
+        async ({ params }) => UserController.getUserFollowings(params.userId),
+        {
+          params: t.Object({
+            userId: t.Numeric(),
           }),
         },
       )

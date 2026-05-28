@@ -126,4 +126,76 @@ export class UserController {
       });
     }
   }
+
+  static async getUserFollowers(userId: number): Promise<Response> {
+    try {
+      const followers = await UserService.getUserFollowers(userId);
+
+      const response = {
+        success: true,
+        data: {
+          followers,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while fetching followers";
+
+      if (error?.message === "USER_NOT_FOUND") {
+        status = 404;
+        message = "User not found";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async getUserFollowings(userId: number): Promise<Response> {
+    try {
+      const followings = await UserService.getUserFollowings(userId);
+
+      const response = {
+        success: true,
+        data: {
+          followings,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while fetching followings";
+
+      if (error?.message === "USER_NOT_FOUND") {
+        status = 404;
+        message = "User not found";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
 }
