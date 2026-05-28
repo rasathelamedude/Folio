@@ -1,5 +1,5 @@
 import { ContentService } from "../services/content.service";
-import { Post, PostInsert } from "../types/Content";
+import { Post, PostInsert, Like } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentController {
@@ -116,12 +116,9 @@ export class ContentController {
     }
   }
 
-  static async createPost(
-    postData: PostInsert,
-    userId: number,
-  ): Promise<Response> {
+  static async createPost(data: PostInsert, userId: number): Promise<Response> {
     try {
-      const newPost: Post = await ContentService.createPost(postData, userId);
+      const newPost: Post = await ContentService.createPost(data, userId);
 
       const response = {
         success: true,
@@ -140,6 +137,58 @@ export class ContentController {
 
       if (error?.message === "POST_CREATION_FAILED") {
         message = "Failed to create the post";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async addLike(
+    data: { postId?: number; commentId?: number },
+    userId: number,
+  ): Promise<Response> {
+    try {
+      const like: Like = await ContentService.addLike(
+        userId,
+        data.postId,
+        data.commentId,
+      );
+
+      const response = {
+        success: true,
+        data: {
+          like,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while adding the like";
+
+      if (error?.message === "INVALID_LIKE_INPUT") {
+        status = 400;
+        message = "Must provide either postId or commentId, but not both";
+      } else if (error?.message === "POST_NOT_FOUND") {
+        status = 404;
+        message = "Post not found";
+      } else if (error?.message === "COMMENT_NOT_FOUND") {
+        status = 404;
+        message = "Comment not found";
+      } else if (error?.message === "ALREADY_LIKED") {
+        status = 409;
+        message = "You have already liked this post or comment";
       }
 
       const response = {

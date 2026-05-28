@@ -93,10 +93,13 @@ export const likes = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
+    // Ensure that either postId or commentId is set, but not both
     check(
       "comment_id_or_post_id",
       sql`(${table.commentId} IS NOT NULL AND ${table.postId} IS NULL) OR (${table.postId} IS NOT NULL AND ${table.commentId} IS NULL)`,
     ),
+
+    // Ensure a user can like a specific post only once and a specific comment only once
     unique("unique_post_like").on(table.userId, table.postId),
     unique("unique_comment_like").on(table.userId, table.commentId),
   ],

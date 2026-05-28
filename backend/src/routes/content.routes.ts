@@ -46,5 +46,15 @@ export const contentRoutes = new Elysia()
             bookId: t.Numeric(),
           }),
         },
+      )
+      .post(
+        "/likes",
+        ({ body, userId }) => ContentController.addLike(body, userId),
+        {
+          body: t.Object({
+            postId: t.Optional(t.Numeric()),
+            commentId: t.Optional(t.Numeric()),
+          }),
+        },
       ),
   );

@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../database/db";
-import { posts } from "../database/schema";
-import { Post, PostInsert } from "../types/Content";
+import { posts, comments, likes } from "../database/schema";
+import { Like, Post, PostInsert } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentService {
@@ -85,6 +85,77 @@ export class ContentService {
       return newPost[0] as Post;
     } catch (error: any) {
       console.error("Create post error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async addLike(
+    userId: number,
+    postId?: number,
+    commentId?: number,
+  ): Promise<Like> {
+    try {
+      // Validate input: must have either postId or commentId, not both
+      const hasPostId = postId !== undefined && postId !== null;
+      const hasCommentId = commentId !== undefined && commentId !== null;
+
+      if (!hasPostId && !hasCommentId) {
+        throw new Error("INVALID_LIKE_INPUT");
+      }
+
+      if (hasPostId && hasCommentId) {
+        throw new Error("INVALID_LIKE_INPUT");
+      }
+
+      // If liking a post, verify it exists
+      if (hasPostId) {
+        const postExists = await db
+          .select({ id: posts.id })
+          .from(posts)
+          .where(eq(posts.id, postId!))
+          .execute();
+
+        if (postExists.length === 0) {
+          throw new Error("POST_NOT_FOUND");
+        }
+      }
+
+      // If liking a comment, verify it exists
+      if (hasCommentId) {
+        const commentExists = await db
+          .select({ id: comments.id })
+          .from(comments)
+          .where(eq(comments.id, commentId!))
+          .execute();
+
+        if (commentExists.length === 0) {
+          throw new Error("COMMENT_NOT_FOUND");
+        }
+      }
+
+      // Insert the like
+      const newLike = await db
+        .insert(likes)
+        .values({
+          userId,
+          postId: hasPostId ? postId : null,
+          commentId: hasCommentId ? commentId : null,
+        })
+        .returning()
+        .execute();
+
+      if (newLike.length === 0) {
+        throw new Error("LIKE_CREATION_FAILED");
+      }
+
+      return newLike[0] as Like;
+    } catch (error: any) {
+      // Handle duplicate like (unique constraint violation)
+      if (error?.code === "23505") {
+        throw new Error("ALREADY_LIKED");
+      }
+
+      console.error("Add like error:", error?.message ?? error);
       throw error;
     }
   }
