@@ -101,8 +101,6 @@ export class AuthController {
       ) {
         status = 401;
         message = "Invalid email or password";
-      } else {
-        console.error("Login error:", error?.message ?? error);
       }
 
       return new Response(JSON.stringify({ success: false, error: message }), {
@@ -114,34 +112,37 @@ export class AuthController {
 
   static async getProfile({ userId }: { userId: number }): Promise<Response> {
     try {
-      console.log("UserID is: " + userId);
-      const user: UserProfile | null = await AuthService.getUserById(userId);
+      const user: UserProfile = await AuthService.getUserById(userId);
 
-      if (!user) {
-        return new Response(
-          JSON.stringify({ success: false, error: "User not found" }),
-          {
-            status: 404,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-      }
+      const response = {
+        success: true,
+        data: {
+          user,
+        },
+      };
 
-      return new Response(JSON.stringify({ success: true, data: { user } }), {
+      return new Response(JSON.stringify(response), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
-    } catch (error) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "An error occurred while fetching the profile",
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+    } catch (error: any) {
+      let status = 500;
+      let message = "An error occurred while fetching the profile";
+
+      if (error?.message === "USER_NOT_FOUND") {
+        status = 404;
+        message = "User not found";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
     }
   }
 }

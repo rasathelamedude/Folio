@@ -19,8 +19,6 @@ export class ContentController {
         headers: { "Content-Type": "application/json" },
       });
     } catch (error: any) {
-      console.error("Get posts by user ID error:", error?.message ?? error);
-
       let status = 500;
       let message = "An error occurred while fetching user posts";
 
@@ -59,8 +57,6 @@ export class ContentController {
         headers: { "Content-Type": "application/json" },
       });
     } catch (error: any) {
-      console.error("Search books error:", error?.message ?? error);
-
       let status = 500;
       let message = "An error occurred while searching for books";
 
@@ -70,6 +66,42 @@ export class ContentController {
       } else if (error?.message === "GOOGLE_API_ERROR") {
         status = 502;
         message = "Failed to fetch from Google Books API";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async getPostById(postId: number): Promise<Response> {
+    try {
+      const post: Post = await ContentService.getPostById(postId);
+
+      const response = {
+        success: true,
+        data: {
+          post: post,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while fetching the post";
+
+      if (error?.message === "POST_NOT_FOUND") {
+        status = 404;
+        message = "Post not found";
       }
 
       const response = {

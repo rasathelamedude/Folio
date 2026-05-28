@@ -50,4 +50,23 @@ export class ContentService {
       throw error;
     }
   }
+
+  static async getPostById(postId: number): Promise<Post> {
+    try {
+      const post: Post[] = await db
+        .select()
+        .from(posts)
+        .where(eq(posts.id, postId))
+        .execute();
+
+      if (post.length === 0) {
+        throw new Error("POST_NOT_FOUND");
+      }
+
+      return post[0] as Post;
+    } catch (error: any) {
+      console.error("Get post by ID error:", error?.message ?? error);
+      throw error;
+    }
+  }
 }

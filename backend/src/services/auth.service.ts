@@ -66,7 +66,7 @@ export class AuthService {
     }
   }
 
-  static async getUserById(userId: number): Promise<UserProfile | null> {
+  static async getUserById(userId: number): Promise<UserProfile> {
     try {
       const user: UserProfile[] = await db
         .select({
@@ -81,7 +81,11 @@ export class AuthService {
         .where(eq(users.id, userId))
         .execute();
 
-      return user.length > 0 ? (user[0] as UserProfile) : null;
+      if (user.length === 0) {
+        throw new Error("USER_NOT_FOUND");
+      }
+
+      return user[0] as UserProfile;
     } catch (error: any) {
       console.error(error?.message ?? error);
       throw error;

@@ -16,8 +16,6 @@ export class UserController {
         headers: { "Content-Type": "application/json" },
       });
     } catch (error: any) {
-      console.error("Delete account error:", error?.message ?? error);
-
       let status = 500;
       let message = "An error occurred while deleting the account";
 
@@ -67,8 +65,6 @@ export class UserController {
         headers: { "Content-Type": "application/json" },
       });
     } catch (error: any) {
-      console.error("Update account error:", error?.message ?? error);
-
       let status = 500;
       let message = "An error occurred while updating the account";
 

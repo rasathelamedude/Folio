@@ -16,6 +16,16 @@ export const contentRoutes = new Elysia()
           }),
         },
       )
+      .get(
+        "/posts/:postID",
+        async ({ params }) =>
+          ContentController.getPostById(parseInt(params.postID)),
+        {
+          params: t.Object({
+            postID: t.String({ pattern: "^[0-9]+$" }),
+          }),
+        },
+      )
       .use(authMiddleware)
       .get(
         "/users/:userID/posts",
