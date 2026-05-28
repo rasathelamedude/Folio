@@ -7,6 +7,15 @@ export const contentRoutes = new Elysia()
   .use(jwtPlugin)
   .group("/api/v1/content", (app) =>
     app
+      .get(
+        "/books",
+        async ({ query }) => ContentController.getBookByName(query.book_name),
+        {
+          query: t.Object({
+            book_name: t.String({ minLength: 1 }),
+          }),
+        },
+      )
       .use(authMiddleware)
       .get(
         "/users/:userID/posts",
@@ -17,5 +26,5 @@ export const contentRoutes = new Elysia()
             userID: t.String({ pattern: "^[0-9]+$" }),
           }),
         },
-      )
+      ),
   );

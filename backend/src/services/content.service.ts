@@ -23,4 +23,31 @@ export class ContentService {
       throw error;
     }
   }
+
+  static async getBookByName(
+    bookName: string,
+  ): Promise<GoogleBooksApiResponse> {
+    try {
+      const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
+      if (!apiKey) {
+        throw new Error("MISSING_API_KEY");
+      }
+
+      // enocode the book name to be URL safe
+      const query = encodeURIComponent(bookName);
+      const response = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${apiKey}`,
+      );
+
+      if (!response.ok) {
+        throw new Error("GOOGLE_API_ERROR");
+      }
+
+      const data = (await response.json()) as GoogleBooksApiResponse;
+      return data;
+    } catch (error: any) {
+      console.error("Search books error:", error?.message ?? error);
+      throw error;
+    }
+  }
 }
