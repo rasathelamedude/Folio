@@ -1,5 +1,5 @@
 import { ContentService } from "../services/content.service";
-import { Post } from "../types/Post";
+import { Post, PostInsert } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentController {
@@ -102,6 +102,44 @@ export class ContentController {
       if (error?.message === "POST_NOT_FOUND") {
         status = 404;
         message = "Post not found";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async createPost(
+    postData: PostInsert,
+    userId: number,
+  ): Promise<Response> {
+    try {
+      const newPost: Post = await ContentService.createPost(postData, userId);
+
+      const response = {
+        success: true,
+        data: {
+          post: newPost,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while creating the post";
+
+      if (error?.message === "POST_CREATION_FAILED") {
+        message = "Failed to create the post";
       }
 
       const response = {

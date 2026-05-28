@@ -1,4 +1,3 @@
-import { JWTService } from "../lib/jwt";
 import { UserService } from "../services/users.service";
 import { UserAccountUpdate, UserProfile } from "../types/User";
 

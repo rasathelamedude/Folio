@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../database/db";
 import { posts } from "../database/schema";
-import { Post } from "../types/Post";
+import { Post, PostInsert } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentService {
@@ -66,6 +66,25 @@ export class ContentService {
       return post[0] as Post;
     } catch (error: any) {
       console.error("Get post by ID error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async createPost(postData: PostInsert, userId: number): Promise<Post> {
+    try {
+      const newPost = await db
+        .insert(posts)
+        .values({ ...postData, userId })
+        .returning()
+        .execute();
+
+      if (newPost.length === 0) {
+        throw new Error("POST_CREATION_FAILED");
+      }
+
+      return newPost[0] as Post;
+    } catch (error: any) {
+      console.error("Create post error:", error?.message ?? error);
       throw error;
     }
   }

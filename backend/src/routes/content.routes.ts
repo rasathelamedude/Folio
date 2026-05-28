@@ -29,11 +29,21 @@ export const contentRoutes = new Elysia()
       .use(authMiddleware)
       .get(
         "/users/:userID/posts",
-        async ({ params }) =>
+        ({ params }) =>
           ContentController.getPostsByUserId(parseInt(params.userID)),
         {
           params: t.Object({
             userID: t.String({ pattern: "^[0-9]+$" }),
+          }),
+        },
+      )
+      .post(
+        "/posts",
+        ({ body, userId }) => ContentController.createPost(body, userId),
+        {
+          body: t.Object({
+            content: t.String({ minLength: 1 }),
+            bookId: t.Numeric(),
           }),
         },
       ),
