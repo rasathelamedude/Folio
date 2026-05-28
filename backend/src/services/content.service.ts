@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../database/db";
 import { posts, comments, likes } from "../database/schema";
-import { Like, Post, PostInsert } from "../types/Content";
+import { Like, Post, PostInsert, Comment } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentService {
@@ -156,6 +156,45 @@ export class ContentService {
       }
 
       console.error("Add like error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async addComment(
+    userId: number,
+    postId: number,
+    content: string,
+  ): Promise<Comment> {
+    try {
+      // Verify the post exists
+      const postExists = await db
+        .select({ id: posts.id })
+        .from(posts)
+        .where(eq(posts.id, postId))
+        .execute();
+
+      if (postExists.length === 0) {
+        throw new Error("POST_NOT_FOUND");
+      }
+
+      // Insert the comment
+      const newComment = await db
+        .insert(comments)
+        .values({
+          userId,
+          postId,
+          content,
+        })
+        .returning()
+        .execute();
+
+      if (newComment.length === 0) {
+        throw new Error("COMMENT_CREATION_FAILED");
+      }
+
+      return newComment[0] as Comment;
+    } catch (error: any) {
+      console.error("Add comment error:", error?.message ?? error);
       throw error;
     }
   }

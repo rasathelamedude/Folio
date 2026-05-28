@@ -56,5 +56,15 @@ export const contentRoutes = new Elysia()
             commentId: t.Optional(t.Numeric()),
           }),
         },
+      )
+      .post(
+        "/comments",
+        ({ body, userId }) => ContentController.addComment(body, userId),
+        {
+          body: t.Object({
+            postId: t.Numeric(),
+            content: t.String({ minLength: 1 }),
+          }),
+        },
       ),
   );

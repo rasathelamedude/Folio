@@ -1,5 +1,5 @@
 import { ContentService } from "../services/content.service";
-import { Post, PostInsert, Like } from "../types/Content";
+import { Post, PostInsert, Like, Comment } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentController {
@@ -189,6 +189,51 @@ export class ContentController {
       } else if (error?.message === "ALREADY_LIKED") {
         status = 409;
         message = "You have already liked this post or comment";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async addComment(
+    data: { postId: number; content: string },
+    userId: number,
+  ): Promise<Response> {
+    try {
+      const comment: Comment = await ContentService.addComment(
+        userId,
+        data.postId,
+        data.content,
+      );
+
+      const response = {
+        success: true,
+        data: {
+          comment,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while creating the comment";
+
+      if (error?.message === "POST_NOT_FOUND") {
+        status = 404;
+        message = "Post not found";
+      } else if (error?.message === "COMMENT_CREATION_FAILED") {
+        message = "Failed to create the comment";
       }
 
       const response = {
