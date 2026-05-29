@@ -132,5 +132,15 @@ export const contentRoutes = new Elysia()
             followed_user_id: t.Numeric(),
           }),
         },
+      )
+      .delete(
+        "/follows",
+        async ({ query, userId }) =>
+          ContentController.unfollowUser(query.followingUserId, userId),
+        {
+          query: t.Object({
+            followingUserId: t.Numeric(),
+          }),
+        },
       ),
   );

@@ -449,4 +449,36 @@ export class ContentController {
       });
     }
   }
+
+  static async unfollowUser(
+    followedUserId: number,
+    userId: number,
+  ): Promise<Response> {
+    try {
+      await ContentService.unfollowUser(userId, followedUserId);
+
+      return new Response("", {
+        status: 204,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while unfollowing the user";
+
+      if (error?.message === "NOT_FOLLOWING") {
+        status = 404;
+        message = "You are not following this user";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
 }

@@ -401,4 +401,29 @@ export class ContentService {
       throw error;
     }
   }
+
+  static async unfollowUser(
+    followerId: number,
+    followedId: number,
+  ): Promise<void> {
+    try {
+      const deletedFollow = await db
+        .delete(follows)
+        .where(
+          and(
+            eq(follows.followerId, followerId),
+            eq(follows.followedId, followedId),
+          ),
+        )
+        .returning()
+        .execute();
+
+      if (deletedFollow.length === 0) {
+        throw new Error("NOT_FOLLOWING");
+      }
+    } catch (error: any) {
+      console.error("Unfollow user error:", error?.message ?? error);
+      throw error;
+    }
+  }
 }
