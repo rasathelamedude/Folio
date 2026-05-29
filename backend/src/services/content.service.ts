@@ -248,4 +248,35 @@ export class ContentService {
       throw error;
     }
   }
+
+  static async deletePost(postId: number, userId: number): Promise<void> {
+    try {
+      const postToDelete: Post[] = await db
+        .select()
+        .from(posts)
+        .where(eq(posts.id, postId))
+        .execute();
+
+      if (postToDelete.length === 0) {
+        throw new Error("POST_NOT_FOUND");
+      }
+
+      if (postToDelete[0].userId !== userId) {
+        throw new Error("UNAUTHORIZED");
+      }
+
+      const deletedPost = await db
+        .delete(posts)
+        .where(eq(posts.id, postId))
+        .returning()
+        .execute();
+
+      if (deletedPost.length === 0) {
+        throw new Error("POST_DELETE_FAILED");
+      }
+    } catch (error: any) {
+      console.error("Delete post error:", error?.message ?? error);
+      throw error;
+    }
+  }
 }

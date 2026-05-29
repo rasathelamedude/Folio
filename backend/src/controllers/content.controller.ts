@@ -296,4 +296,38 @@ export class ContentController {
       });
     }
   }
+
+  static async deletePost(postId: number, userId: number): Promise<Response> {
+    try {
+      await ContentService.deletePost(postId, userId);
+
+      return new Response("", {
+        status: 204,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while deleting the post";
+
+      if (error?.message === "POST_NOT_FOUND") {
+        status = 404;
+        message = "Post not found";
+      } else if (error?.message === "UNAUTHORIZED") {
+        status = 403;
+        message = "You do not have permission to delete this post";
+      } else if (error?.message === "POST_DELETE_FAILED") {
+        message = "Failed to delete the post";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
 }
