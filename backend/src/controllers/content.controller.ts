@@ -330,4 +330,41 @@ export class ContentController {
       });
     }
   }
+
+  static async deleteComment(
+    commentId: number,
+    userId: number,
+  ): Promise<Response> {
+    try {
+      await ContentService.deleteComment(commentId, userId);
+
+      return new Response("", {
+        status: 204,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while deleting the comment";
+
+      if (error?.message === "COMMENT_NOT_FOUND") {
+        status = 404;
+        message = "Comment not found";
+      } else if (error?.message === "UNAUTHORIZED") {
+        status = 403;
+        message = "You do not have permission to delete this comment";
+      } else if (error?.message === "COMMENT_DELETE_FAILED") {
+        message = "Failed to delete the comment";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
 }

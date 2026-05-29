@@ -95,5 +95,15 @@ export const contentRoutes = new Elysia()
             postID: t.Numeric(),
           }),
         },
+      )
+      .delete(
+        "/comments/:commentID",
+        async ({ params, userId }) =>
+          ContentController.deleteComment(params.commentID, userId),
+        {
+          params: t.Object({
+            commentID: t.Numeric(),
+          }),
+        },
       ),
   );

@@ -279,4 +279,35 @@ export class ContentService {
       throw error;
     }
   }
+
+  static async deleteComment(commentId: number, userId: number): Promise<void> {
+    try {
+      const commentToDelete: Comment[] = await db
+        .select()
+        .from(comments)
+        .where(eq(comments.id, commentId))
+        .execute();
+
+      if (commentToDelete.length === 0) {
+        throw new Error("COMMENT_NOT_FOUND");
+      }
+
+      if (commentToDelete[0].userId !== userId) {
+        throw new Error("UNAUTHORIZED");
+      }
+
+      const deletedComment = await db
+        .delete(comments)
+        .where(eq(comments.id, commentId))
+        .returning()
+        .execute();
+
+      if (deletedComment.length === 0) {
+        throw new Error("COMMENT_DELETE_FAILED");
+      }
+    } catch (error: any) {
+      console.error("Delete comment error:", error?.message ?? error);
+      throw error;
+    }
+  }
 }
