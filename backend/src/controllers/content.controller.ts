@@ -1,5 +1,5 @@
 import { ContentService } from "../services/content.service";
-import { Post, PostInsert, Like, Comment } from "../types/Content";
+import { Post, PostInsert, Like, Comment, Follow } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentController {
@@ -389,6 +389,53 @@ export class ContentController {
       } else if (error?.message === "LIKE_NOT_FOUND") {
         status = 404;
         message = "Like not found";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async followUser(
+    followedUserId: number,
+    userId: number,
+  ): Promise<Response> {
+    try {
+      const follow: Follow = await ContentService.followUser(userId, followedUserId);
+
+      const response = {
+        success: true,
+        data: {
+          follow,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while following the user";
+
+      if (error?.message === "CANNOT_FOLLOW_SELF") {
+        status = 400;
+        message = "You cannot follow yourself";
+      } else if (error?.message === "USER_NOT_FOUND") {
+        status = 404;
+        message = "User not found";
+      } else if (error?.message === "ALREADY_FOLLOWING") {
+        status = 409;
+        message = "You are already following this user";
+      } else if (error?.message === "FOLLOW_CREATION_FAILED") {
+        message = "Failed to follow the user";
       }
 
       const response = {

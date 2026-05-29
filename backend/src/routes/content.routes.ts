@@ -122,5 +122,15 @@ export const contentRoutes = new Elysia()
             commentID: t.Optional(t.Numeric({ pattern: "^[0-9]+$" })),
           }),
         },
+      )
+      .post(
+        "/follows",
+        async ({ body, userId }) =>
+          ContentController.followUser(body.followed_user_id, userId),
+        {
+          body: t.Object({
+            followed_user_id: t.Numeric(),
+          }),
+        },
       ),
   );

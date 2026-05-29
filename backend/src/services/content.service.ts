@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../database/db";
-import { posts, comments, likes } from "../database/schema";
-import { Like, Post, PostInsert, Comment } from "../types/Content";
+import { posts, comments, likes, follows, users } from "../database/schema";
+import { Like, Post, PostInsert, Comment, Follow } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentService {
@@ -333,7 +333,9 @@ export class ContentService {
         .where(
           and(
             eq(likes.userId, userId),
-            hasPostId ? eq(likes.postId, postId!) : eq(likes.commentId, commentId!),
+            hasPostId
+              ? eq(likes.postId, postId!)
+              : eq(likes.commentId, commentId!),
           ),
         )
         .returning()
@@ -344,6 +346,58 @@ export class ContentService {
       }
     } catch (error: any) {
       console.error("Remove like error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async followUser(
+    followerId: number,
+    followedId: number,
+  ): Promise<Follow> {
+    try {
+      if (followerId === followedId) {
+        throw new Error("CANNOT_FOLLOW_SELF");
+      }
+
+      const followedUserExists = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, followedId))
+        .limit(1)
+        .execute();
+
+      if (followedUserExists.length === 0) {
+        const userExists = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, followedId))
+          .execute();
+
+        if (userExists.length === 0) {
+          throw new Error("USER_NOT_FOUND");
+        }
+      }
+
+      const newFollow = await db
+        .insert(follows)
+        .values({
+          followerId,
+          followedId,
+        })
+        .returning()
+        .execute();
+
+      if (newFollow.length === 0) {
+        throw new Error("FOLLOW_CREATION_FAILED");
+      }
+
+      return newFollow[0] as Follow;
+    } catch (error: any) {
+      if (error?.code === "23505") {
+        throw new Error("ALREADY_FOLLOWING");
+      }
+
+      console.error("Follow user error:", error?.message ?? error);
       throw error;
     }
   }
