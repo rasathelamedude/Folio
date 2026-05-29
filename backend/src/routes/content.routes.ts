@@ -105,5 +105,22 @@ export const contentRoutes = new Elysia()
             commentID: t.Numeric(),
           }),
         },
+      )
+      .delete(
+        "/likes",
+        async ({ query, userId }) =>
+          ContentController.removeLike(
+            {
+              postId: query.postID ? query.postID : undefined,
+              commentId: query.commentID ? query.commentID : undefined,
+            },
+            userId,
+          ),
+        {
+          query: t.Object({
+            postID: t.Optional(t.Numeric({ pattern: "^[0-9]+$" })),
+            commentID: t.Optional(t.Numeric({ pattern: "^[0-9]+$" })),
+          }),
+        },
       ),
   );

@@ -367,4 +367,39 @@ export class ContentController {
       });
     }
   }
+
+  static async removeLike(
+    data: { postId?: number; commentId?: number },
+    userId: number,
+  ): Promise<Response> {
+    try {
+      await ContentService.removeLike(userId, data.postId, data.commentId);
+
+      return new Response("", {
+        status: 204,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while removing the like";
+
+      if (error?.message === "INVALID_LIKE_INPUT") {
+        status = 400;
+        message = "Must provide either postId or commentId, but not both";
+      } else if (error?.message === "LIKE_NOT_FOUND") {
+        status = 404;
+        message = "Like not found";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
 }

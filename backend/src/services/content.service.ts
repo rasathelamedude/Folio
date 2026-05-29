@@ -310,4 +310,41 @@ export class ContentService {
       throw error;
     }
   }
+
+  static async removeLike(
+    userId: number,
+    postId?: number,
+    commentId?: number,
+  ): Promise<void> {
+    try {
+      const hasPostId = postId !== undefined && postId !== null;
+      const hasCommentId = commentId !== undefined && commentId !== null;
+
+      if (!hasPostId && !hasCommentId) {
+        throw new Error("INVALID_LIKE_INPUT");
+      }
+
+      if (hasPostId && hasCommentId) {
+        throw new Error("INVALID_LIKE_INPUT");
+      }
+
+      const deletedLike = await db
+        .delete(likes)
+        .where(
+          and(
+            eq(likes.userId, userId),
+            hasPostId ? eq(likes.postId, postId!) : eq(likes.commentId, commentId!),
+          ),
+        )
+        .returning()
+        .execute();
+
+      if (deletedLike.length === 0) {
+        throw new Error("LIKE_NOT_FOUND");
+      }
+    } catch (error: any) {
+      console.error("Remove like error:", error?.message ?? error);
+      throw error;
+    }
+  }
 }
