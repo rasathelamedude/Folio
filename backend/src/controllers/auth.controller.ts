@@ -145,4 +145,8 @@ export class AuthController {
       });
     }
   }
+
+  static async signInWithGoogle() {
+    
+  }
 }

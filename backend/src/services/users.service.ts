@@ -42,30 +42,6 @@ export class UserService {
     data: UserAccountUpdate,
   ): Promise<User> {
     try {
-      if (data.username) {
-        const existingUsername = await db
-          .select()
-          .from(users)
-          .where(eq(users.username, data.username))
-          .execute();
-
-        if (existingUsername.length > 0 && existingUsername[0].id !== userId) {
-          throw new Error("USERNAME_IN_USE");
-        }
-      }
-
-      if (data.email) {
-        const existingEmail = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, data.email))
-          .execute();
-
-        if (existingEmail.length > 0 && existingEmail[0].id !== userId) {
-          throw new Error("EMAIL_IN_USE");
-        }
-      }
-
       const updatedUsers = await db
         .update(users)
         .set(data)
@@ -117,7 +93,7 @@ export class UserService {
   static async getUserFollowers(userId: number): Promise<Follower[]> {
     try {
       // Check if user exists
-      if (!this.isUserExists(userId)) {
+      if (!(await this.isUserExists(userId))) {
         throw new Error("USER_NOT_FOUND");
       }
 
@@ -143,7 +119,7 @@ export class UserService {
   static async getUserFollowings(userId: number): Promise<Following[]> {
     try {
       // Check if user exists
-      if (!this.isUserExists(userId)) {
+      if (!(await this.isUserExists(userId))) {
         throw new Error("USER_NOT_FOUND");
       }
 

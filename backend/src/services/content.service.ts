@@ -13,10 +13,6 @@ export class ContentService {
         .where(eq(posts.userId, userId))
         .execute();
 
-      if (userPosts.length === 0) {
-        throw new Error("NO_POSTS_FOUND");
-      }
-
       return userPosts as Post[];
     } catch (error: any) {
       console.error("Get posts by user ID error:", error?.message ?? error);
@@ -107,32 +103,6 @@ export class ContentService {
         throw new Error("INVALID_LIKE_INPUT");
       }
 
-      // If liking a post, verify it exists
-      if (hasPostId) {
-        const postExists = await db
-          .select({ id: posts.id })
-          .from(posts)
-          .where(eq(posts.id, postId!))
-          .execute();
-
-        if (postExists.length === 0) {
-          throw new Error("POST_NOT_FOUND");
-        }
-      }
-
-      // If liking a comment, verify it exists
-      if (hasCommentId) {
-        const commentExists = await db
-          .select({ id: comments.id })
-          .from(comments)
-          .where(eq(comments.id, commentId!))
-          .execute();
-
-        if (commentExists.length === 0) {
-          throw new Error("COMMENT_NOT_FOUND");
-        }
-      }
-
       // Insert the like
       const newLike = await db
         .insert(likes)
@@ -153,6 +123,14 @@ export class ContentService {
       // Handle duplicate like (unique constraint violation)
       if (error?.code === "23505") {
         throw new Error("ALREADY_LIKED");
+      }
+      if (error?.code === "23503") {
+        if (error?.message?.includes("likes_postId_fkey")) {
+          throw new Error("POST_NOT_FOUND");
+        }
+        if (error?.message?.includes("likes_commentId_fkey")) {
+          throw new Error("COMMENT_NOT_FOUND");
+        }
       }
 
       console.error("Add like error:", error?.message ?? error);
@@ -367,15 +345,7 @@ export class ContentService {
         .execute();
 
       if (followedUserExists.length === 0) {
-        const userExists = await db
-          .select()
-          .from(users)
-          .where(eq(users.id, followedId))
-          .execute();
-
-        if (userExists.length === 0) {
-          throw new Error("USER_NOT_FOUND");
-        }
+        throw new Error("USER_NOT_FOUND");
       }
 
       const newFollow = await db

@@ -118,8 +118,8 @@ export const contentRoutes = new Elysia()
           ),
         {
           query: t.Object({
-            postID: t.Optional(t.Numeric({ pattern: "^[0-9]+$" })),
-            commentID: t.Optional(t.Numeric({ pattern: "^[0-9]+$" })),
+            postID: t.Optional(t.Numeric()),
+            commentID: t.Optional(t.Numeric()),
           }),
         },
       )

@@ -20,6 +20,8 @@ export const authRoutes = new Elysia()
           password: t.String({ minLength: 6 }),
         }),
       })
+      .get("/google", () => AuthController.signInWithGoogle())
+      .get("/google/callback", () => "Google Callback")
       .use(authMiddleware)
       .get("/me", ({ userId }) => AuthController.getProfile({ userId })),
   );
