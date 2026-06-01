@@ -42,9 +42,40 @@ export class UserService {
     data: UserAccountUpdate,
   ): Promise<User> {
     try {
+      const updatePayload: Record<string, any> = { ...data };
+
+      if (data.username) {
+        const existingUsername = await db
+          .select()
+          .from(users)
+          .where(eq(users.username, data.username))
+          .execute();
+
+        if (existingUsername.length > 0 && existingUsername[0].id !== userId) {
+          throw new Error("USERNAME_IN_USE");
+        }
+
+        // If they successfully update their username, their profile is complete!
+        updatePayload.isProfileComplete = true;
+      }
+
+      if (data.email) {
+        const existingEmail = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, data.email))
+          .execute();
+
+        if (existingEmail.length > 0 && existingEmail[0].id !== userId) {
+          throw new Error("EMAIL_IN_USE");
+        }
+
+        updatePayload.isProfileComplete = true;
+      }
+
       const updatedUsers = await db
         .update(users)
-        .set(data)
+        .set(updatePayload)
         .where(eq(users.id, userId))
         .returning()
         .execute();

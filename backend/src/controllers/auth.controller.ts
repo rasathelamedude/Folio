@@ -146,7 +146,96 @@ export class AuthController {
     }
   }
 
-  static async signInWithGoogle() {
-    
+  static async signInWithGoogle(): Promise<Response> {
+    try {
+      const params = new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+        response_type: "code",
+        scope: "openid email profile",
+        access_type: "offline",
+        prompt: "consent",
+      });
+
+      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+
+      return Response.redirect(googleAuthUrl);
+    } catch (error: any) {
+      console.error("Sign In with Google Error:", error?.message ?? error);
+
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Failed to initiate Google Sign-In",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+  }
+
+  static async googleCallback({
+    query,
+    jwt,
+  }: {
+    query: { code?: string; error?: string };
+    jwt: JWTService;
+  }): Promise<Response> {
+    try {
+      if (query.error) {
+        throw new Error(`Google Sign-In Error: ${query.error}`);
+      }
+
+      const { code } = query;
+      if (!code) {
+        throw new Error("Authorization code not found in the callback");
+      }
+
+      // Exchange the authorization code for an access token
+      const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: process.env.GOOGLE_CLIENT_ID!,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+          code,
+          redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+          grant_type: "authorization_code",
+        }),
+      });
+
+      const tokenData = await tokenResponse.json();
+      if (!tokenResponse.ok) throw new Error(tokenData.error_description);
+
+      // Use the access token to fetch user's information
+      const userResponse = await fetch(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        {
+          headers: { Authorization: `Bearer: ${tokenData.access_token}` },
+        },
+      );
+
+      const googleUser = await userResponse.json();
+
+      // Find or create a user in the database based on the Google profile
+      const user: User = await AuthService.findOrCreateGoogleUser({
+        email: googleUser.email,
+        name: googleUser.name,
+        googleId: googleUser.id,
+        profilePicture: googleUser.picture,
+      });
+
+      const token = await jwt.sign({ userId: user.id });
+
+      // Redirect back to the mobile app with the token
+      const mobileAppDeepLink = `folio://login-success?token=${token}`;
+      return Response.redirect(mobileAppDeepLink, 302);
+    } catch (error: any) {
+      console.error("Google Callback Error:", error?.message ?? error);
+
+      return Response.redirect(`folio://login-failure?error=auth_failed`, 302);
+    }
   }
 }

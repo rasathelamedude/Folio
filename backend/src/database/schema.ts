@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   check,
   integer,
   pgTable,
@@ -8,16 +9,26 @@ import {
   unique,
 } from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  name: text("name"),
-  username: text("username").unique().notNull(),
-  email: text("email").unique().notNull(),
-  password: text("password"),
-  googleId: text("google_id").unique(),
-  profilePicture: text("profile_picture"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    name: text("name").notNull(),
+    username: text("username").unique().notNull(),
+    email: text("email").unique().notNull(),
+    password: text("password"),
+    googleId: text("google_id").unique(),
+    profilePicture: text("profile_picture"),
+    isProfileComplete: boolean("is_profile_complete").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    check(
+      "password_or_google_id",
+      sql`(${table.password} IS NOT NULL AND ${table.googleId} IS NULL) OR (${table.password} IS NULL AND ${table.googleId} IS NOT NULL)`,
+    ),
+  ],
+);
 
 export const books = pgTable("books", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),

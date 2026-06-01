@@ -7,6 +7,10 @@ export type UserLogin = Pick<User, "email" | "password">;
 export type UserAccountUpdate = Partial<
   Pick<User, "name" | "username" | "profilePicture" | "email">
 >;
+export type UserOAuthSignup = Pick<
+  User,
+  "email" | "name" | "googleId" | "profilePicture"
+>;
 
 export type SimpleUser = Pick<
   User,

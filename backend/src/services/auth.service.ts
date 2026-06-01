@@ -1,7 +1,7 @@
 import { users } from "../database/schema";
 import { db } from "../database/db";
 import { eq } from "drizzle-orm";
-import { User, UserInsert, UserProfile } from "../types/User";
+import { User, UserInsert, UserProfile, UserOAuthSignup } from "../types/User";
 
 export class AuthService {
   static async signup(newUser: UserInsert): Promise<User> {
@@ -76,6 +76,7 @@ export class AuthService {
           email: users.email,
           googleId: users.googleId,
           profilePicture: users.profilePicture,
+          isProfileComplete: users.isProfileComplete,
         })
         .from(users)
         .where(eq(users.id, userId))
@@ -86,6 +87,69 @@ export class AuthService {
       }
 
       return user[0] as UserProfile;
+    } catch (error: any) {
+      console.error(error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async findOrCreateGoogleUser({
+    email,
+    name,
+    googleId,
+    profilePicture,
+  }: UserOAuthSignup): Promise<User> {
+    try {
+      const user: User[] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .execute();
+
+      if (user.length > 0) {
+        const foundUser: User = user[0];
+
+        // Link Google account if not already linked
+        if (!foundUser.googleId) {
+          const updatedUsers: User[] = await db
+            .update(users)
+            .set({
+              googleId,
+              profilePicture: foundUser.profilePicture ?? profilePicture,
+            })
+            .where(eq(users.id, foundUser.id))
+            .returning()
+            .execute();
+
+          return updatedUsers[0] as User;
+        }
+
+        return foundUser as User;
+      }
+
+      const tempId = crypto.randomUUID().split("-")[0];
+      const tempUsername = `folio_${tempId}`;
+
+      const newUser: UserInsert = {
+        email,
+        name,
+        username: tempUsername,
+        googleId,
+        profilePicture,
+        isProfileComplete: false,
+      };
+
+      const insertedUsers: User[] = await db
+        .insert(users)
+        .values(newUser)
+        .returning()
+        .execute();
+
+      if (insertedUsers.length === 0) {
+        throw new Error("FAILED_TO_CREATE_GOOGLE_USER");
+      }
+
+      return insertedUsers[0] as User;
     } catch (error: any) {
       console.error(error?.message ?? error);
       throw error;

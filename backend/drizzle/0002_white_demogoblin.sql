@@ -1,0 +1,2 @@
+ALTER TABLE "users" ADD COLUMN "is_profile_complete" boolean DEFAULT true NOT NULL;--> statement-breakpoint
+ALTER TABLE "users" ADD CONSTRAINT "password_or_google_id" CHECK (("users"."password" IS NOT NULL AND "users"."google_id" IS NULL) OR ("users"."password" IS NULL AND "users"."google_id" IS NOT NULL));
