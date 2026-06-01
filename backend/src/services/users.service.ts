@@ -59,20 +59,6 @@ export class UserService {
         updatePayload.isProfileComplete = true;
       }
 
-      if (data.email) {
-        const existingEmail = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, data.email))
-          .execute();
-
-        if (existingEmail.length > 0 && existingEmail[0].id !== userId) {
-          throw new Error("EMAIL_IN_USE");
-        }
-
-        updatePayload.isProfileComplete = true;
-      }
-
       const updatedUsers = await db
         .update(users)
         .set(updatePayload)

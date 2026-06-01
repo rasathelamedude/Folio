@@ -127,6 +127,7 @@ export class AuthService {
         return foundUser as User;
       }
 
+      // Create a temporary username
       const tempId = crypto.randomUUID().split("-")[0];
       const tempUsername = `folio_${tempId}`;
 
