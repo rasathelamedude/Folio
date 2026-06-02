@@ -420,7 +420,7 @@ export class ContentService {
     try {
       // 1. Decode the cursor
       let cursorDate: Date | null = null;
-      let cursorWasFollowed: boolean | null = null;
+      let cursorIsFollowed: boolean | null = null;
 
       if (cursor) {
         const decoded = JSON.parse(
@@ -428,7 +428,7 @@ export class ContentService {
         );
 
         cursorDate = new Date(decoded.date);
-        cursorWasFollowed = decoded.wasFollowed;
+        cursorIsFollowed = decoded.isFollowed;
       }
 
       // 2. Define the subquery for "Is followed by me"
@@ -441,8 +441,8 @@ export class ContentService {
       // 3. Define the pagination condition
       let paginationCondition = undefined;
 
-      if (cursorDate && cursorWasFollowed !== null) {
-        if (cursorWasFollowed) {
+      if (cursorDate && cursorIsFollowed !== null) {
+        if (cursorIsFollowed) {
           // If the last post was from a follower, get older follower posts,
           // OR fallback to global posts (which have an older priority in our sort)
           paginationCondition = sql`(${isFollowedQuery} AND ${posts.createdAt} < ${cursorDate}) OR (NOT ${isFollowedQuery})`;
@@ -614,7 +614,7 @@ export class ContentService {
         })
         .from(usersBooks)
         .innerJoin(books, eq(usersBooks.bookId, books.id))
-        .where(eq(usersBooks.userId, users.id))
+        .where(eq(usersBooks.userId, userId))
         .execute();
 
       return readList;
