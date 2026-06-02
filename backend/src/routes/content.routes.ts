@@ -27,6 +27,9 @@ export const contentRoutes = new Elysia()
         },
       )
       .use(authMiddleware)
+      .get("/feed", ({ userId, query }) =>
+        ContentController.getFeed(userId, query.cursor),
+      )
       .get(
         "/users/:userID/posts",
         ({ params }) =>

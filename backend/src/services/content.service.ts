@@ -1,7 +1,14 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql, desc } from "drizzle-orm";
 import { db } from "../database/db";
 import { posts, comments, likes, follows, users } from "../database/schema";
-import { Like, Post, PostInsert, Comment, Follow } from "../types/Content";
+import {
+  Like,
+  Post,
+  PostInsert,
+  Comment,
+  Follow,
+  FeedPost,
+} from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentService {
@@ -393,6 +400,104 @@ export class ContentService {
       }
     } catch (error: any) {
       console.error("Unfollow user error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async getFeed(
+    userId: number,
+    cursor?: string,
+  ): Promise<{ posts: FeedPost[]; nextCursor: string | null }> {
+    try {
+      // 1. Decode the cursor
+      let cursorDate: Date | null = null;
+      let cursorWasFollowed: boolean | null = null;
+
+      if (cursor) {
+        const decoded = JSON.parse(
+          Buffer.from(cursor, "base64").toString("utf-8"),
+        );
+
+        cursorDate = new Date(decoded.date);
+        cursorWasFollowed = decoded.wasFollowed;
+      }
+
+      // 2. Define the subquery for "Is followed by me"
+      const isFollowedQuery = sql<boolean>`EXISTS (
+        SELECT 1 FROM ${follows}
+        WHERE ${follows.followedId} = ${posts.userId}
+        AND ${follows.followerId} = ${userId}
+      )`;
+
+      // 3. Define the pagination condition
+      let paginationCondition = undefined;
+
+      if (cursorDate && cursorWasFollowed !== null) {
+        if (cursorWasFollowed) {
+          // If the last post was from a follower, get older follower posts,
+          // OR fallback to global posts (which have an older priority in our sort)
+          paginationCondition = sql`(${isFollowedQuery} AND ${posts.createdAt} < ${cursorDate}) OR (NOT ${isFollowedQuery})`;
+        } else {
+          // If we are already in the global section of the feed, just get older global posts
+          paginationCondition = sql`NOT ${isFollowedQuery} AND ${posts.createdAt} < ${cursorDate}`;
+        }
+      }
+
+      // 4. The query
+      const feed: FeedPost[] = await db
+        .select({
+          id: posts.id,
+          content: posts.content,
+          createdAt: posts.createdAt,
+          bookId: posts.bookId,
+          author: {
+            id: users.id,
+            username: users.username,
+            name: users.name,
+            profilePicture: users.profilePicture,
+          },
+          metrics: {
+            likeCount: sql<number>`SELECT COUNT(*)::int FROM ${likes} WHERE ${likes.postId} = ${posts.id}`,
+            commentCount: sql<number>`SELECT COUNT(*)::int FROM ${comments} WHERE ${comments.postId} = ${posts.id}`,
+          },
+          context: {
+            isLikedByMe: sql<boolean>`EXISTS (
+            SELECT 1 FROM ${likes}
+            WHERE ${likes.postId} = ${posts.id}
+            AND ${likes.userId} = ${userId}
+          )`,
+            isMine: sql<boolean>`${posts.userId} = ${userId}`,
+            isFollowed: isFollowedQuery,
+          },
+        })
+        .from(posts)
+        .innerJoin(users, eq(posts.userId, users.id))
+        .where(paginationCondition)
+        .orderBy(
+          desc(isFollowedQuery), // Sort 1: Followed users at the top
+          desc(posts.createdAt), // Sort 2: Newest posts first
+        )
+        .limit(20)
+        .execute();
+
+      // 5. Define the next cursor
+      let nextCursor: string | null = null;
+      if (feed.length === 20) {
+        const lastPost = feed[feed.length - 1];
+        const cursorData = {
+          date: lastPost.createdAt,
+          isFollowed: lastPost.context.isFollowed,
+        };
+
+        nextCursor = Buffer.from(JSON.stringify(cursorData)).toString("base64");
+      }
+
+      return {
+        posts: feed as FeedPost[],
+        nextCursor, // If null, the frontend knows there are no more posts!
+      };
+    } catch (error: any) {
+      console.error(`An Error occuered while fetching feed: ${error.message}`);
       throw error;
     }
   }

@@ -1,5 +1,12 @@
 import { ContentService } from "../services/content.service";
-import { Post, PostInsert, Like, Comment, Follow } from "../types/Content";
+import {
+  Post,
+  PostInsert,
+  Like,
+  Comment,
+  Follow,
+  FeedPost,
+} from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentController {
@@ -408,7 +415,10 @@ export class ContentController {
     userId: number,
   ): Promise<Response> {
     try {
-      const follow: Follow = await ContentService.followUser(userId, followedUserId);
+      const follow: Follow = await ContentService.followUser(
+        userId,
+        followedUserId,
+      );
 
       const response = {
         success: true,
@@ -469,6 +479,41 @@ export class ContentController {
         status = 404;
         message = "You are not following this user";
       }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async getFeed(userId: number, cursor?: string): Promise<Response> {
+    try {
+      const { posts, nextCursor } = await ContentService.getFeed(
+        userId,
+        cursor,
+      );
+
+      const response = {
+        success: true,
+        data: {
+          posts,
+          nextCursor,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while fetching the feed";
 
       const response = {
         success: false,
