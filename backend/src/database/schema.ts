@@ -32,27 +32,32 @@ export const users = pgTable(
 
 export const books = pgTable("books", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  googleBookId: text("google_book_id").unique().notNull(),
   title: text("title").notNull(),
-  author: text("author").notNull(),
+  author: text("author"),
   description: text("description"),
   coverImageURL: text("cover_image_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const usersBooks = pgTable("users_books", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer("user_id")
-    .references(() => users.id, {
-      onDelete: "cascade",
-    })
-    .notNull(),
-  bookId: integer("book_id")
-    .references(() => books.id, {
-      onDelete: "cascade",
-    })
-    .notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const usersBooks = pgTable(
+  "users_books",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id")
+      .references(() => users.id, {
+        onDelete: "cascade",
+      })
+      .notNull(),
+    bookId: integer("book_id")
+      .references(() => books.id, {
+        onDelete: "cascade",
+      })
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [unique("unique_user_book").on(table.userId, table.bookId)],
+);
 
 export const posts = pgTable("posts", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),

@@ -1,6 +1,14 @@
 import { eq, and, sql, desc } from "drizzle-orm";
 import { db } from "../database/db";
-import { posts, comments, likes, follows, users } from "../database/schema";
+import {
+  posts,
+  comments,
+  likes,
+  follows,
+  users,
+  books,
+  usersBooks,
+} from "../database/schema";
 import {
   Like,
   Post,
@@ -8,8 +16,9 @@ import {
   Comment,
   Follow,
   FeedPost,
+  LocalBook,
 } from "../types/Content";
-import { GoogleBooksApiResponse } from "../types/GoogleBooks";
+import { GoogleBook, GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentService {
   static async getPostsByUserId(userId: number): Promise<Post[]> {
@@ -498,6 +507,119 @@ export class ContentService {
       };
     } catch (error: any) {
       console.error(`An Error occuered while fetching feed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  static async addBookToReadList(
+    userId: number,
+    bookData: {
+      googleBookId: string;
+      title: string;
+      authors?: string[];
+      description?: string;
+      coverImageURL?: string;
+    },
+  ): Promise<LocalBook> {
+    try {
+      // 1. See if the book exists in local db
+      const localBook = await db
+        .select()
+        .from(books)
+        .where(eq(books.googleBookId, bookData.googleBookId))
+        .execute();
+
+      let bookId: number;
+      let newBooks: LocalBook[] | null = null;
+      if (localBook.length === 0) {
+        // if it doesn't exist insert it
+        newBooks = await db
+          .insert(books)
+          .values({
+            googleBookId: bookData.googleBookId,
+            title: bookData.title,
+            author: bookData.authors
+              ? bookData.authors.join(", ")
+              : "Unknown Author",
+            description: bookData.description || null,
+            coverImageURL: bookData.coverImageURL || null,
+          })
+          .returning()
+          .execute();
+
+        bookId = newBooks[0].id;
+      } else {
+        bookId = localBook[0].id;
+      }
+
+      // 2. See if the book is already added by the user
+      const alreadyAdded = await db
+        .select()
+        .from(usersBooks)
+        .where(
+          and(eq(usersBooks.userId, userId), eq(usersBooks.bookId, bookId)),
+        )
+        .execute();
+
+      if (alreadyAdded.length > 0) {
+        throw new Error("BOOK_ALREADY_IN_READ_LIST");
+      }
+
+      // otherwise insert it
+      await db
+        .insert(usersBooks)
+        .values({ userId, bookId })
+        .returning()
+        .execute();
+
+      return newBooks ? newBooks[0] : localBook[0];
+    } catch (error: any) {
+      console.error("Add book error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async removeBookFromReadList(
+    userId: number,
+    bookId: number,
+  ): Promise<void> {
+    try {
+      const result = await db
+        .delete(usersBooks)
+        .where(
+          and(eq(usersBooks.userId, userId), eq(usersBooks.bookId, bookId)),
+        )
+        .returning()
+        .execute();
+
+      if (result.length === 0) {
+        throw new Error("BOOK_NOT_IN_READ_LIST");
+      }
+    } catch (error: any) {
+      console.error("Remove from book list error ", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async getUserReadList(userId: number) {
+    try {
+      const readList = await db
+        .select({
+          id: books.id,
+          googleBookId: books.googleBookId,
+          title: books.title,
+          author: books.author,
+          coverImageURL: books.coverImageURL,
+          addedAt: usersBooks.createdAt,
+        })
+        .from(usersBooks)
+        .innerJoin(books, eq(usersBooks.bookId, books.id))
+        .where(eq(usersBooks.userId, users.id))
+        .execute();
+
+      return readList;
+    } catch (error: any) {
+      console.error("Get read list error:", error?.message ?? error);
       throw error;
     }
   }

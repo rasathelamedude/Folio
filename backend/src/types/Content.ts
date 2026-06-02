@@ -1,5 +1,4 @@
-import { posts, comments, likes, follows } from "../database/schema";
-import { User } from "./User";
+import { posts, comments, likes, follows, books } from "../database/schema";
 
 export type Post = typeof posts.$inferSelect;
 export type PostInsert = Omit<typeof posts.$inferInsert, "userId">;
@@ -34,3 +33,6 @@ export type FeedPost = {
     isFollowed: boolean;
   };
 };
+
+export type LocalBook = typeof books.$inferSelect;
+export type LocalBookInsert = typeof books.$inferInsert;

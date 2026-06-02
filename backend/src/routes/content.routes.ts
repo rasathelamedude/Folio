@@ -30,6 +30,32 @@ export const contentRoutes = new Elysia()
       .get("/feed", ({ userId, query }) =>
         ContentController.getFeed(userId, query.cursor),
       )
+      .get("/users/me/books", ({ userId }) =>
+        ContentController.getUserReadList(userId),
+      )
+      .post(
+        "/users/me/books",
+        ({ userId, body }) => ContentController.addBookToReadList(userId, body),
+        {
+          body: t.Object({
+            googleBookId: t.String({ minLength: 1 }),
+            title: t.String({ minLength: 1 }),
+            authors: t.Optional(t.Array(t.String())),
+            description: t.Optional(t.String()),
+            coverImageURL: t.Optional(t.String()),
+          }),
+        },
+      )
+      .delete(
+        "/users/me/books/:bookID",
+        ({ userId, params }) =>
+          ContentController.removeBookFromReadList(userId, params.bookID),
+        {
+          params: t.Object({
+            bookID: t.Numeric(),
+          }),
+        },
+      )
       .get(
         "/users/:userID/posts",
         ({ params }) =>

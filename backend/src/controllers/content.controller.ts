@@ -526,4 +526,114 @@ export class ContentController {
       });
     }
   }
+
+  static async getUserReadList(userId: number): Promise<Response> {
+    try {
+      const readList = await ContentService.getUserReadList(userId);
+
+      const response = {
+        success: true,
+        data: {
+          readList,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string = "An error occurred while fetching the read list";
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async removeBookFromReadList(
+    userId: number,
+    bookId: number,
+  ): Promise<Response> {
+    try {
+      await ContentService.removeBookFromReadList(userId, bookId);
+
+      return new Response("", {
+        status: 204,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string =
+        "An error occurred while removing the book from the read list";
+
+      if (error?.message === "BOOK_NOT_IN_READ_LIST") {
+        status = 404;
+        message = "Book not found in your read list";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async addBookToReadList(
+    userId: number,
+    bookData: {
+      googleBookId: string;
+      title: string;
+      authors?: string[];
+      description?: string;
+      coverImageURL?: string;
+    },
+  ): Promise<Response> {
+    try {
+      const book = await ContentService.addBookToReadList(userId, bookData);
+
+      const response = {
+        success: true,
+        data: {
+          book,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status: number = 500;
+      let message: string =
+        "An error occurred while adding the book to the read list";
+
+      if (error?.message === "BOOK_ALREADY_IN_READ_LIST") {
+        status = 400;
+        message = "This book is already in your read list";
+      }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
 }
