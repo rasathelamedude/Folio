@@ -1,14 +1,17 @@
 import { AuthService } from "../services/auth.service";
 import { User, UserInsert, UserProfile, UserLogin } from "../types/User";
 import { JWTService } from "../lib/jwt";
+import { Cookie } from "elysia";
 
 export class AuthController {
   static async signup({
     body,
     jwt,
+    cookie,
   }: {
     body: UserInsert;
     jwt: JWTService;
+    cookie: { authToken: Cookie<string | undefined> };
   }): Promise<Response> {
     try {
       // Create the user
@@ -16,6 +19,15 @@ export class AuthController {
 
       // Generate JWT token
       const token = await jwt.sign({ userId: createdUser.id });
+
+      cookie.authToken.set({
+        value: token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+        path: "/",
+      });
 
       // Prepare the response
       const resp = {
@@ -27,7 +39,6 @@ export class AuthController {
             email: createdUser.email,
             profilePicture: createdUser.profilePicture,
           },
-          token,
         },
       };
 
@@ -62,9 +73,11 @@ export class AuthController {
   static async login({
     body,
     jwt,
+    cookie,
   }: {
     body: UserLogin;
     jwt: JWTService;
+    cookie: { authToken: Cookie<string | undefined> };
   }): Promise<Response> {
     try {
       const authenticatedUser: User = await AuthService.login(
@@ -73,6 +86,15 @@ export class AuthController {
       );
 
       const token = await jwt.sign({ userId: authenticatedUser.id });
+
+      cookie.authToken.set({
+        value: token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+        path: "/",
+      });
 
       const response = {
         success: true,
@@ -83,7 +105,6 @@ export class AuthController {
             email: authenticatedUser.email,
             profilePicture: authenticatedUser.profilePicture,
           },
-          token,
         },
       };
 
