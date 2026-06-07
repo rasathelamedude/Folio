@@ -1,9 +1,9 @@
 import { Elysia } from "elysia";
-import { jwtPlugin } from "../lib/jwt";
+import { accessJwtPlugin } from "../lib/accessJwt";
 
 export const authMiddleware = (app: Elysia) =>
-  app.use(jwtPlugin).derive(async ({ cookie, jwt, set }) => {
-    const token: string | undefined = cookie.authToken?.value as
+  app.use(accessJwtPlugin).derive(async ({ cookie, accessJwt, set }) => {
+    const token: string | undefined = cookie.accessToken?.value as
       | string
       | undefined;
 
@@ -12,7 +12,7 @@ export const authMiddleware = (app: Elysia) =>
       throw new Error("No token provided");
     }
 
-    const payload = await jwt.verify(token);
+    const payload = await accessJwt.verify(token);
 
     if (!payload || payload.userId === undefined) {
       set.status = 401;

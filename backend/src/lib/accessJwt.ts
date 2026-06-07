@@ -6,10 +6,10 @@ export interface JWTService {
   verify: (token: string) => Promise<any>;
 }
 
-export const jwtPlugin = new Elysia().use(
+export const accessJwtPlugin = new Elysia().use(
   jwt({
-    name: "jwt",
-    secret: process.env.JWT_SECRET!,
-    exp: "7d",
+    name: "accessJwt",
+    secret: process.env.ACCESS_JWT_SECRET!,
+    exp: "30m",
   }),
 );

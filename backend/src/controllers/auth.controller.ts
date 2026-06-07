@@ -1,27 +1,42 @@
 import { AuthService } from "../services/auth.service";
 import { User, UserInsert, UserProfile, UserLogin } from "../types/User";
-import { JWTService } from "../lib/jwt";
+import { JWTService } from "../lib/accessJwt";
 import { Cookie } from "elysia";
 
 export class AuthController {
   static async signup({
     body,
-    jwt,
+    accessJwt,
+    refreshJwt,
     cookie,
   }: {
     body: UserInsert;
-    jwt: JWTService;
-    cookie: { authToken: Cookie<string | undefined> };
+    accessJwt: JWTService;
+    refreshJwt: JWTService;
+    cookie: {
+      accessToken: Cookie<string | undefined>;
+      refreshToken: Cookie<string | undefined>;
+    };
   }): Promise<Response> {
     try {
       // Create the user
       const createdUser: User = await AuthService.signup(body);
 
       // Generate JWT token
-      const token = await jwt.sign({ userId: createdUser.id });
+      const accessToken = await accessJwt.sign({ userId: createdUser.id });
+      const refreshToken = await refreshJwt.sign({ userId: createdUser.id });
 
-      cookie.authToken.set({
-        value: token,
+      cookie.accessToken.set({
+        value: accessToken,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 30, // 30 minutes
+        path: "/",
+      });
+
+      cookie.refreshToken.set({
+        value: refreshToken,
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
@@ -72,12 +87,17 @@ export class AuthController {
 
   static async login({
     body,
-    jwt,
+    accessJwt,
+    refreshJwt,
     cookie,
   }: {
     body: UserLogin;
-    jwt: JWTService;
-    cookie: { authToken: Cookie<string | undefined> };
+    accessJwt: JWTService;
+    refreshJwt: JWTService;
+    cookie: {
+      accessToken: Cookie<string | undefined>;
+      refreshToken: Cookie<string | undefined>;
+    };
   }): Promise<Response> {
     try {
       const authenticatedUser: User = await AuthService.login(
@@ -85,10 +105,24 @@ export class AuthController {
         body.password!,
       );
 
-      const token = await jwt.sign({ userId: authenticatedUser.id });
+      const accessToken = await accessJwt.sign({
+        userId: authenticatedUser.id,
+      });
+      const refreshToken = await refreshJwt.sign({
+        userId: authenticatedUser.id,
+      });
 
-      cookie.authToken.set({
-        value: token,
+      cookie.accessToken.set({
+        value: accessToken,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 30, // 30 minutes
+        path: "/",
+      });
+
+      cookie.refreshToken.set({
+        value: refreshToken,
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
@@ -167,7 +201,11 @@ export class AuthController {
     }
   }
 
-  static async signInWithGoogle(): Promise<Response> {
+  static async signInWithGoogle({
+    query,
+  }: {
+    query: { client: "web" | "mobile" };
+  }): Promise<Response> {
     try {
       const params = new URLSearchParams({
         client_id: process.env.GOOGLE_CLIENT_ID!,
@@ -176,6 +214,7 @@ export class AuthController {
         scope: "openid email profile",
         access_type: "offline",
         prompt: "consent",
+        client: query.client,
       });
 
       const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
@@ -199,10 +238,17 @@ export class AuthController {
 
   static async googleCallback({
     query,
-    jwt,
+    accessJwt,
+    refreshJwt,
+    cookie,
   }: {
-    query: { code?: string; error?: string };
-    jwt: JWTService;
+    query: { code?: string; error?: string; client: "web" | "mobile" };
+    accessJwt: JWTService;
+    refreshJwt: JWTService;
+    cookie: {
+      accessToken: Cookie<string | undefined>;
+      refreshToken: Cookie<string | undefined>;
+    };
   }): Promise<Response> {
     try {
       if (query.error) {
@@ -234,7 +280,7 @@ export class AuthController {
       const userResponse = await fetch(
         "https://www.googleapis.com/oauth2/v2/userinfo",
         {
-          headers: { Authorization: `Bearer: ${tokenData.access_token}` },
+          headers: { Authorization: `Bearer ${tokenData.access_token}` },
         },
       );
 
@@ -248,11 +294,34 @@ export class AuthController {
         profilePicture: googleUser.picture,
       });
 
-      const token = await jwt.sign({ userId: user.id });
+      const accessToken = await accessJwt.sign({ userId: user.id });
+      const refreshToken = await refreshJwt.sign({ userId: user.id });
 
-      // Redirect back to the mobile app with the token
-      const mobileAppDeepLink = `folio://login-success?token=${token}`;
-      return Response.redirect(mobileAppDeepLink, 302);
+      if (query.client === "web") {
+        cookie.accessToken.set({
+          value: accessToken,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 60 * 30, // 30 minutes
+          path: "/",
+        });
+
+        cookie.refreshToken.set({
+          value: refreshToken,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+          path: "/",
+        });
+
+        return Response.redirect(`${process.env.FRONTEND_URL}/feed`, 302);
+      } else {
+        // Redirect back to the mobile app with the token
+        const mobileAppDeepLink = `folio://login-success?accessToken=${accessToken}&refreshToken=${refreshToken}`;
+        return Response.redirect(mobileAppDeepLink, 302);
+      }
     } catch (error: any) {
       console.error("Google Callback Error:", error?.message ?? error);
 
