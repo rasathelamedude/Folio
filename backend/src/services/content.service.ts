@@ -414,7 +414,7 @@ export class ContentService {
   }
 
   static async getFeed(
-    userId: number,
+    userId?: number,
     cursor?: string,
   ): Promise<{ posts: FeedPost[]; nextCursor: string | null }> {
     try {
@@ -432,11 +432,16 @@ export class ContentService {
       }
 
       // 2. Define the subquery for "Is followed by me"
-      const isFollowedQuery = sql<boolean>`EXISTS (
-        SELECT 1 FROM ${follows}
-        WHERE ${follows.followedId} = ${posts.userId}
-        AND ${follows.followerId} = ${userId}
-      )`;
+      let isFollowedQuery;
+      if (userId !== undefined) {
+        isFollowedQuery = sql<boolean>`EXISTS (
+          SELECT 1 FROM ${follows}
+          WHERE ${follows.followedId} = ${posts.userId}
+          AND ${follows.followerId} = ${userId}
+        )`;
+      } else {
+        isFollowedQuery = sql<boolean>`FALSE`;
+      }
 
       // 3. Define the pagination condition
       let paginationCondition = undefined;
@@ -466,26 +471,29 @@ export class ContentService {
             profilePicture: users.profilePicture,
           },
           metrics: {
-            likeCount: sql<number>`SELECT COUNT(*)::int FROM ${likes} WHERE ${likes.postId} = ${posts.id}`,
-            commentCount: sql<number>`SELECT COUNT(*)::int FROM ${comments} WHERE ${comments.postId} = ${posts.id}`,
+            likeCount: sql<number>`(SELECT COUNT(*)::int FROM ${likes} WHERE ${likes.postId} = ${posts.id})`,
+            commentCount: sql<number>`(SELECT COUNT(*)::int FROM ${comments} WHERE ${comments.postId} = ${posts.id})`,
           },
           context: {
-            isLikedByMe: sql<boolean>`EXISTS (
+            isLikedByMe:
+              userId != undefined
+                ? sql<boolean>`EXISTS (
             SELECT 1 FROM ${likes}
             WHERE ${likes.postId} = ${posts.id}
             AND ${likes.userId} = ${userId}
-          )`,
-            isMine: sql<boolean>`${posts.userId} = ${userId}`,
+          )`
+                : sql<boolean>`FALSE`,
+            isMine:
+              userId != undefined
+                ? sql<boolean>`${posts.userId} = ${userId}`
+                : sql<boolean>`FALSE`,
             isFollowed: isFollowedQuery,
           },
         })
         .from(posts)
         .innerJoin(users, eq(posts.userId, users.id))
         .where(paginationCondition)
-        .orderBy(
-          desc(isFollowedQuery), // Sort 1: Followed users at the top
-          desc(posts.createdAt), // Sort 2: Newest posts first
-        )
+        .orderBy(desc(isFollowedQuery), desc(posts.createdAt))
         .limit(20)
         .execute();
 

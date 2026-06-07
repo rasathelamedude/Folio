@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia";
 import { ContentController } from "../controllers/content.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
+import { optionalAuthMiddleware } from "../middleware/optionalAuth.middleware";
 
 export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
   app
@@ -22,8 +23,16 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
         }),
       },
     )
-    .use(authMiddleware)
-    // TODO: FIX AUTH ON FEED
+    .get(
+      "/users/:userID/posts",
+      ({ params }) => ContentController.getPostsByUserId(params.userID),
+      {
+        params: t.Object({
+          userID: t.Numeric(),
+        }),
+      },
+    )
+    .use(optionalAuthMiddleware)
     .get(
       "/feed",
       ({ userId, query }) => ContentController.getFeed(userId, query.cursor),
@@ -33,6 +42,7 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
         }),
       },
     )
+    .use(authMiddleware)
     .get("/users/me/books", ({ userId }) =>
       ContentController.getUserReadList(userId),
     )
@@ -56,15 +66,6 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
       {
         params: t.Object({
           bookID: t.Numeric(),
-        }),
-      },
-    )
-    .get(
-      "/users/:userID/posts",
-      ({ params }) => ContentController.getPostsByUserId(params.userID),
-      {
-        params: t.Object({
-          userID: t.Numeric(),
         }),
       },
     )

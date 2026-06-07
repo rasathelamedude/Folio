@@ -492,7 +492,7 @@ export class ContentController {
     }
   }
 
-  static async getFeed(userId: number, cursor?: string): Promise<Response> {
+  static async getFeed(userId?: number, cursor?: string): Promise<Response> {
     try {
       const { posts, nextCursor } = await ContentService.getFeed(
         userId,
