@@ -214,7 +214,7 @@ export class AuthController {
         scope: "openid email profile",
         access_type: "offline",
         prompt: "consent",
-        client: query.client,
+        state: query.client,
       });
 
       const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
@@ -242,7 +242,7 @@ export class AuthController {
     refreshJwt,
     cookie,
   }: {
-    query: { code?: string; error?: string; client: "web" | "mobile" };
+    query: { code?: string; error?: string; state?: "web" | "mobile" };
     accessJwt: JWTService;
     refreshJwt: JWTService;
     cookie: {
@@ -297,7 +297,7 @@ export class AuthController {
       const accessToken = await accessJwt.sign({ userId: user.id });
       const refreshToken = await refreshJwt.sign({ userId: user.id });
 
-      if (query.client === "web") {
+      if (query.state === "web") {
         cookie.accessToken.set({
           value: accessToken,
           httpOnly: true,

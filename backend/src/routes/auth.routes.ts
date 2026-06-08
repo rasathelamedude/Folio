@@ -81,7 +81,7 @@ export const authRoutes = new Elysia()
           query: t.Object({
             code: t.Optional(t.String() || t.Undefined()),
             error: t.Optional(t.String() || t.Undefined()),
-            client: t.Enum(Client),
+            state: t.Optional(t.Enum(Client) || t.Undefined()),
           }),
         },
       )
