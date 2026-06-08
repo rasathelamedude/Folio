@@ -95,5 +95,5 @@ export async function logout() {
 }
 
 export async function signInWithGoogle() {
-  window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google?clie`;
+  window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google?client=web`;
 }
