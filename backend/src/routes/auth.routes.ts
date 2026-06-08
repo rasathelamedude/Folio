@@ -85,6 +85,14 @@ export const authRoutes = new Elysia()
           }),
         },
       )
+      .post("/logout", ({ cookie }) =>
+        AuthController.logout({
+          cookie: cookie as {
+            accessToken: Cookie<string | undefined>;
+            refreshToken: Cookie<string | undefined>;
+          },
+        }),
+      )
       .use(authMiddleware)
       .get("/me", ({ userId }: { userId: number }) =>
         AuthController.getProfile({ userId }),

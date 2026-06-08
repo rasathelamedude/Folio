@@ -328,4 +328,21 @@ export class AuthController {
       return Response.redirect(`folio://login-failure?error=auth_failed`, 302);
     }
   }
+
+  static async logout({
+    cookie,
+  }: {
+    cookie: {
+      accessToken: Cookie<string | undefined>;
+      refreshToken: Cookie<string | undefined>;
+    };
+  }): Promise<Response> {
+    cookie.accessToken.remove();
+    cookie.refreshToken.remove();
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 }
