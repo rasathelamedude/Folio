@@ -91,7 +91,13 @@ export class UserService {
   static async getUserByUsername(username: string): Promise<UserProfile> {
     try {
       const user = await db
-        .select()
+        .select({
+          id: users.id,
+          name: users.name,
+          username: users.username,
+          email: users.email,
+          profilePicture: users.profilePicture,
+        })
         .from(users)
         .where(eq(users.username, username))
         .execute();

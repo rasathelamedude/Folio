@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Cookie, Elysia, t } from "elysia";
 import { UserController } from "../controllers/users.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 
@@ -32,8 +32,14 @@ export const userRoutes = new Elysia().group("/api/v1/users", (app) =>
       },
     )
     .use(authMiddleware)
-    .delete("/account", async ({ userId }) =>
-      UserController.deleteAccount({ userId }),
+    .delete("/account", async ({ userId, cookie }) =>
+      UserController.deleteAccount({
+        userId,
+        cookie: cookie as {
+          accessToken: Cookie<string | undefined>;
+          refreshToken: Cookie<string | undefined>;
+        },
+      }),
     )
     .patch(
       "/account",

@@ -1,14 +1,23 @@
+import { Cookie } from "elysia";
 import { UserService } from "../services/users.service";
 import { UserAccountUpdate, UserProfile } from "../types/User";
 
 export class UserController {
   static async deleteAccount({
     userId,
+    cookie,
   }: {
     userId: number;
+    cookie: {
+      accessToken: Cookie<string | undefined>;
+      refreshToken: Cookie<string | undefined>;
+    };
   }): Promise<Response> {
     try {
       await UserService.deleteAccount({ userId });
+
+      cookie.accessToken.remove();
+      cookie.refreshToken.remove();
 
       return new Response("", {
         status: 204,
@@ -55,7 +64,6 @@ export class UserController {
             name: updatedUser.name,
             profilePicture: updatedUser.profilePicture,
           },
-          message: "Account updated successfully",
         },
       };
 
