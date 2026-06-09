@@ -457,6 +457,11 @@ export class ContentService {
         }
       }
 
+      const orderByCondition =
+        userId !== undefined
+          ? [desc(isFollowedQuery), desc(posts.createdAt)]
+          : [desc(posts.createdAt)];
+
       // 4. The query
       const feed: FeedPost[] = await db
         .select({
@@ -493,7 +498,7 @@ export class ContentService {
         .from(posts)
         .innerJoin(users, eq(posts.userId, users.id))
         .where(paginationCondition)
-        .orderBy(desc(isFollowedQuery), desc(posts.createdAt))
+        .orderBy(...orderByCondition)
         .limit(20)
         .execute();
 
