@@ -1,5 +1,10 @@
 import axios from "./axios";
-import { type Follower, type Following } from "../types/User";
+import {
+  type Follower,
+  type Following,
+  type UserAccountUpdate,
+  type User,
+} from "../types/User";
 
 export async function getUserFollowers(userId: number): Promise<Follower[]> {
   const response = await axios.get(`/users/${userId}/followers`);
@@ -25,8 +30,36 @@ export async function getUserFollowings(userId: number): Promise<Following[]> {
   return data.data;
 }
 
-export async function updateUserAccount() {}
+export async function updateUserAccount(userData: UserAccountUpdate) {
+  const response = await axios.patch("/users/account", userData);
 
-export async function deleteUserAccount() {}
+  const data = response.data;
 
-export async function getUserByUsername() {}
+  if (!data.success) {
+    throw new Error("Something went wrong when updating account");
+  }
+
+  return data.data;
+}
+
+export async function deleteUserAccount(): Promise<boolean> {
+  const response = await axios.delete("/users/account");
+
+  if (response.status !== 204) {
+    throw new Error("Something went wrong when deleting account");
+  }
+
+  return true;
+}
+
+export async function getUserByUsername(username: string): Promise<User> {
+  const response = await axios.get(`/users?username=${username}`);
+
+  const data = response.data;
+
+  if (!data.success) {
+    throw new Error("Something went wrong when getting user");
+  }
+
+  return data.data;
+}

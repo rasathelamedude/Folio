@@ -2,25 +2,18 @@ import { type UserSignupData, type UserLoginData } from "../types/User";
 import axios from "./axios";
 
 export async function login({ email, password }: UserLoginData) {
-  try {
-    const response = await axios.post("/auth/login", {
-      email,
-      password,
-    });
+  const response = await axios.post("/auth/login", {
+    email,
+    password,
+  });
 
-    const data = response.data;
+  const data = response.data;
 
-    if (!data) {
-      throw new Error("Something went wrong");
-    }
-
-    return data;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error occured while loging in: ", error.message);
-      throw error;
-    }
+  if (!data) {
+    throw new Error("Something went wrong");
   }
+
+  return data.data;
 }
 
 export async function signup({
@@ -30,68 +23,45 @@ export async function signup({
   username,
   profilePicture,
 }: UserSignupData) {
-  try {
-    const response = await axios.post("/auth/signup", {
-      email,
-      password,
-      name,
-      username,
-      profilePicture,
-    });
+  const response = await axios.post("/auth/signup", {
+    email,
+    password,
+    name,
+    username,
+    profilePicture,
+  });
 
-    const data = response.data;
+  const data = response.data;
 
-    if (!data.success) {
-      throw new Error("Something went wrong when signing up");
-    }
-
-    return data;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(error?.message);
-      throw error;
-    }
+  if (!data.success) {
+    throw new Error("Something went wrong when signing up");
   }
+
+  return data.data;
 }
 
 export async function getProfile() {
-  try {
-    const response = await axios.get("/auth/me");
+  const response = await axios.get("/auth/me");
 
-    const data = response.data;
+  const data = response.data;
 
-    if (!data.success) {
-      throw new Error("Something went wrong when getting profile");
-    }
-
-    return data;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(
-        error?.message ?? "Something went wrong when getting profile",
-      );
-      throw error;
-    }
+  if (!data.success) {
+    throw new Error("Something went wrong when getting profile");
   }
+
+  return data.data;
 }
 
 export async function logout() {
-  try {
-    const response = await axios.post("/auth/logout");
+  const response = await axios.post("/auth/logout");
 
-    const data = response.data;
+  const data = response.data;
 
-    if (!data.success) {
-      throw new Error("Something went wrong when logging out");
-    }
-
-    return data;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(error?.message);
-      throw error;
-    }
+  if (!data.success) {
+    throw new Error("Something went wrong when logging out");
   }
+
+  return data.data;
 }
 
 export async function signInWithGoogle() {
