@@ -71,12 +71,33 @@ export class ContentService {
   static async getPostsByUserId(userId: number): Promise<Post[]> {
     try {
       const userPosts = await db
-        .select()
+        .select({
+          id: posts.id,
+          content: posts.content,
+          createdAt: posts.createdAt,
+          userId: posts.userId,
+          bookId: posts.bookId,
+          user: {
+            id: users.id,
+            username: users.username,
+            name: users.name,
+            profilePicture: users.profilePicture,
+          },
+          book: {
+            googleBookId: books.googleBookId,
+            title: books.title,
+            authors: books.authors,
+            description: books.description,
+            coverImageURL: books.coverImageURL,
+          },
+        })
         .from(posts)
+        .leftJoin(users, eq(users.id, posts.userId))
+        .leftJoin(books, eq(books.id, posts.bookId))
         .where(eq(posts.userId, userId))
         .execute();
 
-      return userPosts as Post[];
+      return userPosts;
     } catch (error: any) {
       console.error("Get posts by user ID error:", error?.message ?? error);
       throw error;
