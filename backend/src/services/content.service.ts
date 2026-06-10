@@ -113,8 +113,29 @@ export class ContentService {
   static async getPostById(postId: number): Promise<Post> {
     try {
       const post: Post[] = await db
-        .select()
+        .select({
+          id: posts.id,
+          content: posts.content,
+          createdAt: posts.createdAt,
+          userId: posts.userId,
+          bookId: posts.bookId,
+          user: {
+            id: users.id,
+            username: users.username,
+            name: users.name,
+            profilePicture: users.profilePicture,
+          },
+          book: {
+            googleBookId: books.googleBookId,
+            title: books.title,
+            authors: books.authors,
+            description: books.description,
+            coverImageURL: books.coverImageURL,
+          },
+        })
         .from(posts)
+        .leftJoin(users, eq(posts.userId, users.id))
+        .leftJoin(books, eq(posts.bookId, books.id))
         .where(eq(posts.id, postId))
         .execute();
 
@@ -122,7 +143,7 @@ export class ContentService {
         throw new Error("POST_NOT_FOUND");
       }
 
-      return post[0] as Post;
+      return post[0];
     } catch (error: any) {
       console.error("Get post by ID error:", error?.message ?? error);
       throw error;
