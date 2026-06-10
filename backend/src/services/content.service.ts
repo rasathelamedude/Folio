@@ -17,10 +17,56 @@ import {
   Follow,
   FeedPost,
   LocalBook,
+  LocalBookInsert,
 } from "../types/Content";
-import { GoogleBook, GoogleBooksApiResponse } from "../types/GoogleBooks";
+import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentService {
+  private static async getLocalBook(
+    googleBookId: string,
+  ): Promise<LocalBook | null> {
+    try {
+      const localBook = await db
+        .select()
+        .from(books)
+        .where(eq(books.googleBookId, googleBookId))
+        .execute();
+
+      if (localBook.length === 0) {
+        return null;
+      }
+
+      return localBook[0];
+    } catch (error: any) {
+      console.error(
+        `Error occured when fetching local book: ${error?.message}`,
+      );
+      return null;
+    }
+  }
+
+  private static async insertLocalBook(
+    book: LocalBookInsert,
+  ): Promise<LocalBook> {
+    const localBook = await db
+      .insert(books)
+      .values({
+        googleBookId: book.googleBookId,
+        title: book.title,
+        authors: book.authors,
+        description: book.description || null,
+        coverImageURL: book.coverImageURL || null,
+      })
+      .returning()
+      .execute();
+
+    if (localBook.length === 0) {
+      throw new Error("LOCAL_BOOK_INSERTION_FAILED");
+    }
+
+    return localBook[0];
+  }
+
   static async getPostsByUserId(userId: number): Promise<Post[]> {
     try {
       const userPosts = await db
@@ -84,9 +130,24 @@ export class ContentService {
 
   static async createPost(postData: PostInsert, userId: number): Promise<Post> {
     try {
+      const { content, book } = postData;
+      let localBook: LocalBook | null = null;
+
+      if (book !== undefined) {
+        localBook = await this.getLocalBook(book.googleBookId);
+
+        if (localBook == null) {
+          localBook = await this.insertLocalBook(book);
+        }
+      }
+
       const newPost = await db
         .insert(posts)
-        .values({ ...postData, userId })
+        .values({
+          userId,
+          content,
+          bookId: localBook !== null ? localBook.id : null,
+        })
         .returning()
         .execute();
 
@@ -536,33 +597,19 @@ export class ContentService {
   ): Promise<LocalBook> {
     try {
       // 1. See if the book exists in local db
-      const localBook = await db
-        .select()
-        .from(books)
-        .where(eq(books.googleBookId, bookData.googleBookId))
-        .execute();
+      const localBook: LocalBook | null = await this.getLocalBook(
+        bookData.googleBookId,
+      );
 
       let bookId: number;
-      let newBooks: LocalBook[] | null = null;
-      if (localBook.length === 0) {
+      let newBook: LocalBook | null = null;
+      if (localBook == null) {
         // if it doesn't exist insert it
-        newBooks = await db
-          .insert(books)
-          .values({
-            googleBookId: bookData.googleBookId,
-            title: bookData.title,
-            author: bookData.authors
-              ? bookData.authors.join(", ")
-              : "Unknown Author",
-            description: bookData.description || null,
-            coverImageURL: bookData.coverImageURL || null,
-          })
-          .returning()
-          .execute();
+        newBook = await this.insertLocalBook(bookData);
 
-        bookId = newBooks[0].id;
+        bookId = newBook.id;
       } else {
-        bookId = localBook[0].id;
+        bookId = localBook.id;
       }
 
       // 2. See if the book is already added by the user
@@ -585,7 +632,7 @@ export class ContentService {
         .returning()
         .execute();
 
-      return newBooks ? newBooks[0] : localBook[0];
+      return newBook ? newBook : (localBook as LocalBook);
     } catch (error: any) {
       console.error("Add book error:", error?.message ?? error);
       throw error;
@@ -621,7 +668,7 @@ export class ContentService {
           id: books.id,
           googleBookId: books.googleBookId,
           title: books.title,
-          author: books.author,
+          authors: books.authors,
           coverImageURL: books.coverImageURL,
           addedAt: usersBooks.createdAt,
         })

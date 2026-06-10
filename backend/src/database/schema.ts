@@ -34,7 +34,7 @@ export const books = pgTable("books", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   googleBookId: text("google_book_id").unique().notNull(),
   title: text("title").notNull(),
-  author: text("author"),
+  authors: text("author").array(),
   description: text("description"),
   coverImageURL: text("cover_image_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -66,11 +66,9 @@ export const posts = pgTable("posts", {
       onDelete: "cascade",
     })
     .notNull(),
-  bookId: integer("book_id")
-    .references(() => books.id, {
-      onDelete: "cascade",
-    })
-    .notNull(),
+  bookId: integer("book_id").references(() => books.id, {
+    onDelete: "cascade",
+  }),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

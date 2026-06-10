@@ -8,6 +8,7 @@ export interface GoogleBook {
       thumbnail?: string;
       smallThumbnail?: string;
     };
+    categories?: string[];
     publishedDate?: string;
     pageCount?: number;
   };

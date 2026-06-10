@@ -29,6 +29,20 @@
       "when": 1780413060372,
       "tag": "0003_misty_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781037578437,
+      "tag": "0004_even_otto_octavius",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781084204914,
+      "tag": "0005_shiny_namor",
+      "breakpoints": true
     }
   ]
 }

@@ -78,7 +78,16 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
           {
             body: t.Object({
               content: t.String({ minLength: 1 }),
-              bookId: t.Numeric(),
+              book: t.Optional(
+                t.Object({
+                  bookId: t.Union([t.Numeric(), t.Null()]),
+                  googleBookId: t.String(),
+                  title: t.String(),
+                  authors: t.Optional(t.ArrayString()),
+                  description: t.Optional(t.String()),
+                  coverImageUrl: t.Optional(t.String()),
+                }),
+              ),
             }),
           },
         )

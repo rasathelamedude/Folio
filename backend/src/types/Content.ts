@@ -1,7 +1,17 @@
 import { posts, comments, likes, follows, books } from "../database/schema";
 
 export type Post = typeof posts.$inferSelect;
-export type PostInsert = Omit<typeof posts.$inferInsert, "userId">;
+export type PostInsert = {
+  content: string;
+  book?: {
+    bookId?: number | null;
+    googleBookId: string;
+    title: string;
+    authors?: string[];
+    description?: string;
+    coverImageUrl?: string;
+  };
+};
 
 export type Comment = typeof comments.$inferSelect;
 export type CommentInsert = typeof comments.$inferInsert;
