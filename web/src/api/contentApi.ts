@@ -131,12 +131,55 @@ export async function deleteComment(commentId: number): Promise<boolean> {
   return true;
 }
 
-export async function getPostsOfUser() {}
-export async function getPostById() {}
+export async function getPostsOfUser(userId: number) {
+  const response = await axios.get(`/content/users/${userId}/posts`);
 
-export async function followUser() {}
-export async function unfollowUser() {}
+  const data = response.data;
 
-export async function getUserReadList() {}
-export async function addToReadList() {}
-export async function removeFromReadList() {}
+  if (!data.success) {
+    throw new Error("Something went wrong when getting posts of user");
+  }
+
+  return data.data;
+}
+export async function getPostById(postId: number) {
+  const response = await axios.get(`/content/posts/${postId}`);
+
+  const data = response.data;
+
+  if (!data.success) {
+    throw new Error("Something went wrong when getting post");
+  }
+
+  return data.data;
+}
+
+export async function followUser(followedUserId: number) {
+  const response = await axios.post("/content/follows", {
+    followed_user_id: followedUserId,
+  });
+
+  const data = response.data;
+
+  if (!data.success) {
+    throw new Error("Something went wrong when following user");
+  }
+
+  return data.data;
+}
+export async function unfollowUser(followingUserId: number): Promise<boolean> {
+  const response = await axios.delete(
+    `/content/follows?followingUserId=${followingUserId}`,
+  );
+
+  if (response.status !== 204) {
+    throw new Error("Something went wrong when unfollowing user");
+  }
+
+  return true;
+}
+
+// TODO: implement
+// export async function getUserReadList() {}
+// export async function addToReadList() {}
+// export async function removeFromReadList() {}

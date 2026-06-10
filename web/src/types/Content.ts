@@ -15,7 +15,7 @@ export type ShareablePost = {
     title: string;
     description?: string;
     coverImageUrl?: string;
-    
+    authors?: string[];
   }
 }
 

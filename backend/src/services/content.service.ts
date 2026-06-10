@@ -77,12 +77,6 @@ export class ContentService {
           createdAt: posts.createdAt,
           userId: posts.userId,
           bookId: posts.bookId,
-          user: {
-            id: users.id,
-            username: users.username,
-            name: users.name,
-            profilePicture: users.profilePicture,
-          },
           book: {
             googleBookId: books.googleBookId,
             title: books.title,
@@ -92,7 +86,6 @@ export class ContentService {
           },
         })
         .from(posts)
-        .leftJoin(users, eq(users.id, posts.userId))
         .leftJoin(books, eq(books.id, posts.bookId))
         .where(eq(posts.userId, userId))
         .execute();
