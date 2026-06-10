@@ -15,11 +15,20 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
       },
     )
     .get(
-      "/posts/:postID",
-      ({ params }) => ContentController.getPostById(params.postID),
+      "/posts/:postId/comments",
+      ({ params }) => ContentController.getCommentsForPost(params.postId),
       {
         params: t.Object({
-          postID: t.Numeric(),
+          postId: t.Numeric(),
+        }),
+      },
+    )
+    .get(
+      "/posts/:postId",
+      ({ params }) => ContentController.getPostById(params.postId),
+      {
+        params: t.Object({
+          postId: t.Numeric(),
         }),
       },
     )
@@ -29,15 +38,6 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
       {
         params: t.Object({
           userID: t.Numeric(),
-        }),
-      },
-    )
-    .get(
-      "/content/posts/:postId/comments",
-      ({ params }) => ContentController.getCommentsForPost(params.postId),
-      {
-        params: t.Object({
-          postId: t.Numeric(),
         }),
       },
     )
@@ -145,22 +145,22 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
           },
         )
         .delete(
-          "/posts/:postID",
+          "/posts/:postId",
           ({ params, userId }) =>
-            ContentController.deletePost(params.postID, userId),
+            ContentController.deletePost(params.postId, userId),
           {
             params: t.Object({
-              postID: t.Numeric(),
+              postId: t.Numeric(),
             }),
           },
         )
         .delete(
-          "/comments/:commentID",
+          "/comments/:commentId",
           ({ params, userId }) =>
-            ContentController.deleteComment(params.commentID, userId),
+            ContentController.deleteComment(params.commentId, userId),
           {
             params: t.Object({
-              commentID: t.Numeric(),
+              commentId: t.Numeric(),
             }),
           },
         )
