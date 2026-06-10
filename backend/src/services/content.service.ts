@@ -18,6 +18,7 @@ import {
   FeedPost,
   LocalBook,
   LocalBookInsert,
+  PostComments,
 } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
@@ -124,6 +125,34 @@ export class ContentService {
       return post[0] as Post;
     } catch (error: any) {
       console.error("Get post by ID error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async getCommentsForPost(postId: number): Promise<PostComments[]> {
+    try {
+      const postComments = await db
+        .select({
+          id: comments.id,
+          content: comments.content,
+          createdAt: comments.createdAt,
+          postId: comments.postId,
+          user: {
+            id: users.id,
+            username: users.username,
+            name: users.name,
+            profilePicture: users.profilePicture,
+          },
+        })
+        .from(comments)
+        .leftJoin(users, eq(comments.userId, users.id))
+        .where(eq(comments.postId, postId))
+        .orderBy(desc(comments.createdAt))
+        .execute();
+
+      return postComments as PostComments[];
+    } catch (error: any) {
+      console.error("Get comments for post error:", error?.message ?? error);
       throw error;
     }
   }

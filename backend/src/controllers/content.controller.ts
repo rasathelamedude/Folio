@@ -6,6 +6,7 @@ import {
   Comment,
   Follow,
   FeedPost,
+  PostComments,
 } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
@@ -33,6 +34,38 @@ export class ContentController {
         status = 404;
         message = "No posts found for this user";
       }
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  static async getCommentsForPost(postId: number): Promise<Response> {
+    try {
+      const comments: PostComments[] =
+        await ContentService.getCommentsForPost(postId);
+
+      const response = {
+        success: true,
+        data: {
+          comments,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      let status = 500;
+      let message = "An error occurred while fetching comments";
 
       const response = {
         success: false,

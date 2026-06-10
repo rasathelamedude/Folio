@@ -32,6 +32,15 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
         }),
       },
     )
+    .get(
+      "/content/posts/:postId/comments",
+      ({ params }) => ContentController.getCommentsForPost(params.postId),
+      {
+        params: t.Object({
+          postId: t.Numeric(),
+        }),
+      },
+    )
     .use(optionalAuthMiddleware)
     .get(
       "/feed",
