@@ -1,4 +1,4 @@
-import React, { type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 
 const ProtectedRoute = ({ children, isAuthenticated }: Props) => {
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
