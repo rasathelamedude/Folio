@@ -64,6 +64,6 @@ export async function logout() {
   return data.data;
 }
 
-export async function signInWithGoogle() {
+export function signInWithGoogle() {
   window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google?client=web`;
 }

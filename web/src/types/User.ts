@@ -5,7 +5,7 @@ export interface User {
   email: string;
   id: number;
   password?: string | null;
-  googleId: string | null;
+  googleId?: string | null;
   isProfileComplete: boolean;
   createdAt: Date;
 }

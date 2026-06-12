@@ -1,7 +1,6 @@
-import React from "react";
 import Sidebar from "../components/ui/Sidebar";
 import RightPanel from "../components/ui/RightPanel";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet } from "react-router-dom";
 
 const AppLayout = () => {
   return (
