@@ -316,7 +316,7 @@ export class AuthController {
           path: "/",
         });
 
-        return Response.redirect(`${process.env.FRONTEND_URL}/feed`, 302);
+        return Response.redirect(`${process.env.FRONTEND_URL}/`, 302);
       } else {
         // Redirect back to the mobile app with the token
         const mobileAppDeepLink = `folio://login-success?accessToken=${accessToken}&refreshToken=${refreshToken}`;
