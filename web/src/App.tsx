@@ -3,6 +3,8 @@ import AppLayout from "./layout/AppLayout";
 import { lazy, Suspense } from "react";
 import AuthLayout from "./layout/AuthLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
@@ -17,6 +19,8 @@ function App() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/library" element={<LibraryPage />} />
