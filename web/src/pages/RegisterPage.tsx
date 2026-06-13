@@ -96,6 +96,7 @@ const RegisterPage = () => {
               <div className="flex-1">
                 <InputField
                   required
+                  type="text"
                   name="name"
                   label="Full name"
                   value={formData.name}
@@ -114,6 +115,7 @@ const RegisterPage = () => {
                   required
                   name="username"
                   onChange={handleChange}
+                  type="text"
                   placeholder="rasyar"
                   value={formData.username}
                   label="Username"
@@ -139,21 +141,23 @@ const RegisterPage = () => {
             {/* Password Input */}
             <PasswordField
               required
+              placeholder="At least 7 characters"
               name="password"
               label="Password"
               setIsPasswordVisible={setIsPasswordVisible}
               isPasswordVisible={isPasswordVisible}
-              handleChange={handleChange}
+              onChange={handleChange}
             />
 
             {/* Confirm Password Input */}
             <PasswordField
               required
+              placeholder="At least 7 characters"
               name="confirmPassword"
               label="Confirm password"
               isPasswordVisible={isConfirmPasswordVisible}
               setIsPasswordVisible={setIsConfirmPasswordVisible}
-              handleChange={() => {}}
+              onChange={() => {}}
             />
 
             {isError && (

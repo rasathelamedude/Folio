@@ -23,7 +23,10 @@ const InputField = ({
 }: InputProps) => {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-700 mb-1.5">
+      <label
+        className="block text-xs font-medium text-gray-700 mb-1.5"
+        htmlFor={name}
+      >
         {label}
       </label>
 
@@ -33,6 +36,7 @@ const InputField = ({
         </div>
 
         <input
+          id={name}
           required={required}
           name={name}
           type={type}

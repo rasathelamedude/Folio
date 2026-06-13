@@ -7,7 +7,8 @@ interface PasswordFieldProps {
   label: string;
   isPasswordVisible: boolean;
   setIsPasswordVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const PasswordField = ({
@@ -16,11 +17,15 @@ const PasswordField = ({
   label,
   isPasswordVisible,
   setIsPasswordVisible,
-  handleChange,
+  onChange,
+  placeholder = "",
 }: PasswordFieldProps) => {
   return (
     <>
-      <label className="block text-xs font-medium text-gray-700 mb-1.5">
+      <label
+        className="block text-xs font-medium text-gray-700 mb-1.5"
+        htmlFor={name}
+      >
         {label}
       </label>
       <div className="relative">
@@ -28,11 +33,12 @@ const PasswordField = ({
           <CiLock className="text-gray-600 font-bold text-md" />
         </div>
         <input
+          id={name}
           required={required}
-          onChange={handleChange}
+          onChange={onChange}
           name={name}
           type={isPasswordVisible ? "text" : "password"}
-          placeholder="At least 8 characters"
+          placeholder={placeholder}
           className="w-full pl-10 pr-10 py-2.5 bg-[#FBF9F6] border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3A7D64] focus:border-transparent transition-all placeholder-gray-400"
         />
         <div
