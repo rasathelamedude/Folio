@@ -5,6 +5,7 @@ import AuthLayout from "./layout/AuthLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import { useUserStore } from "./store/userStore";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
@@ -14,7 +15,8 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 
 function App() {
-  const isAuthenticated: boolean = true;
+  const user = useUserStore((state) => state.user);
+  const isAuthenticated = !!user;
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
