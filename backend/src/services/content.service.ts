@@ -1,4 +1,4 @@
-import { eq, and, sql, desc, count } from "drizzle-orm";
+import { eq, and, sql, desc, count, ne } from "drizzle-orm";
 import { db } from "../database/db";
 import {
   posts,
@@ -22,6 +22,7 @@ import {
   TrendingBook,
 } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
+import { User } from "../types/User";
 
 export class ContentService {
   private static async getLocalBook(
@@ -769,6 +770,27 @@ export class ContentService {
       return totalPostsByBook;
     } catch (error) {
       console.error(`Error occured when fetching trending books: ${error}`);
+      throw error;
+    }
+  }
+
+  static async getSuggestedUsers(userId: number | undefined): Promise<User[]> {
+    try {
+      const count = await db.$count(users);
+      const offset = Math.floor(Math.random() * Math.max(count - 3, 0));
+      const whereCondition =
+        userId !== undefined ? ne(users.id, userId) : undefined;
+
+      const suggestedUsers = await db
+        .select()
+        .from(users)
+        .where(whereCondition)
+        .limit(3)
+        .offset(offset);
+
+      return suggestedUsers;
+    } catch (error) {
+      console.error(`Error occured when fetching suggested users: ${error}`);
       throw error;
     }
   }

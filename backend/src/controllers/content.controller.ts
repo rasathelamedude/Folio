@@ -11,6 +11,22 @@ import {
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
 export class ContentController {
+  static async getSuggestedUsers(userId: number | undefined): Promise<Response> {
+    const suggestedUsers = await ContentService.getSuggestedUsers(userId);
+
+    const response = {
+      success: true,
+      data: {
+        suggestedUsers,
+      },
+    };
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   static async getPostsByUserId(userId: number): Promise<Response> {
     try {
       const userPosts: Post[] = await ContentService.getPostsByUserId(userId);
@@ -688,6 +704,16 @@ export class ContentController {
     } catch (error) {
       let status = 500;
       let message = "An error occurred while fetching the trending books";
+
+      const response = {
+        success: false,
+        error: message,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: status,
+        headers: { "Content-Type": "application/json" },
+      });
     }
   }
 }
