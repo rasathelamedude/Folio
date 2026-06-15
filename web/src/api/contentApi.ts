@@ -179,6 +179,30 @@ export async function unfollowUser(followingUserId: number): Promise<boolean> {
   return true;
 }
 
+export async function getTrendingBooks() {
+  const response = await axios.get("/content/books/trending");
+
+  const data = response.data;
+
+  if (!data.success) {
+    throw new Error("Something went wrong when getting trending books");
+  }
+
+  return data.data;
+}
+
+export async function getSuggestedUsers() {
+  const response = await axios.get("/content/users/suggestions");
+
+  const data = response.data;
+
+  if (!data.success) {
+    throw new Error("Something went wrong when getting suggested users");
+  }
+
+  return data.data;
+}
+
 // TODO: implement
 // export async function getUserReadList() {}
 // export async function addToReadList() {}

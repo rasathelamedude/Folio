@@ -16,8 +16,8 @@ export type ShareablePost = {
     description?: string;
     coverImageUrl?: string;
     authors?: string[];
-  }
-}
+  };
+};
 
 export type Like = {
   userId: number;
@@ -47,4 +47,11 @@ export type FeedPost = {
     isMine: boolean;
     isFollowed: boolean;
   };
+};
+
+export type TrendingBook = {
+  title: string;
+  authors: string[] | null;
+  coverImageUrl: string | null;
+  postCount: number;
 };
