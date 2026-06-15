@@ -1,4 +1,4 @@
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, sql, desc, count } from "drizzle-orm";
 import { db } from "../database/db";
 import {
   posts,
@@ -19,6 +19,7 @@ import {
   LocalBook,
   LocalBookInsert,
   PostComments,
+  TrendingBook,
 } from "../types/Content";
 import { GoogleBooksApiResponse } from "../types/GoogleBooks";
 
@@ -744,6 +745,30 @@ export class ContentService {
       return readList;
     } catch (error: any) {
       console.error("Get read list error:", error?.message ?? error);
+      throw error;
+    }
+  }
+
+  static async getTrendingBooks(): Promise<TrendingBook[]> {
+    try {
+      // number of posts made about a specific book
+      // starting from
+      const totalPostsByBook: TrendingBook[] = await db
+        .select({
+          title: books.title,
+          authors: books.authors,
+          coverImageUrl: books.coverImageURL,
+          postCount: count(posts.id),
+        })
+        .from(books)
+        .innerJoin(posts, eq(books.id, posts.bookId))
+        .groupBy(books.title, books.authors, books.coverImageURL)
+        .orderBy(desc(count(posts.id)))
+        .execute();
+
+      return totalPostsByBook;
+    } catch (error) {
+      console.error(`Error occured when fetching trending books: ${error}`);
       throw error;
     }
   }

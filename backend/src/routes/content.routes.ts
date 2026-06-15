@@ -41,6 +41,7 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
         }),
       },
     )
+    .get("/books/trending", () => ContentController.getTrendingBooks())
     .use(optionalAuthMiddleware)
     .get(
       "/feed",

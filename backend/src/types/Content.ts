@@ -58,3 +58,10 @@ export type FeedPost = {
 
 export type LocalBook = typeof books.$inferSelect;
 export type LocalBookInsert = typeof books.$inferInsert;
+
+export type TrendingBook = {
+  title: string;
+  authors: string[] | null;
+  coverImageUrl: string | null;
+  postCount: number;
+};

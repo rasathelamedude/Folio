@@ -669,4 +669,25 @@ export class ContentController {
       });
     }
   }
+
+  static async getTrendingBooks() {
+    try {
+      const trendingBooks = await ContentService.getTrendingBooks();
+
+      const response = {
+        success: true,
+        data: {
+          trendingBooks,
+        },
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      let status = 500;
+      let message = "An error occurred while fetching the trending books";
+    }
+  }
 }
