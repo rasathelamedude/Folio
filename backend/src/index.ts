@@ -4,6 +4,7 @@ import { userRoutes } from "./routes/users.routes";
 import { contentRoutes } from "./routes/content.routes";
 import { cors } from "@elysiajs/cors";
 import { cookie } from "@elysiajs/cookie";
+import { HealthController } from "./controllers/health.controller";
 
 export const app = new Elysia()
   .use(cors())
@@ -11,6 +12,8 @@ export const app = new Elysia()
   .use(authRoutes)
   .use(userRoutes)
   .use(contentRoutes);
+
+app.get("/health", () => HealthController.check());
 
 app.listen(3000);
 
