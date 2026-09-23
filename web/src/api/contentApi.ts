@@ -6,7 +6,15 @@ import {
   type FeedPost,
 } from "~/types/posts";
 import type { Like } from "~/types/likes";
-import type { GoogleBooksApiResponse } from "~/types/books";
+import type {
+  AddReadListPayload,
+  AddToReadListApiResponse,
+  GetUserReadListApiResponse,
+  GoogleBooksApiResponse,
+  LocalBook,
+  ReadListBook,
+} from "~/types/books";
+import type { ApiResponse } from "~/types/api";
 
 export async function getFeed(): Promise<{
   posts: FeedPost[];
@@ -203,7 +211,45 @@ export async function getSuggestedUsers() {
   return data.data;
 }
 
-// TODO: implement
-// export async function getUserReadList() {}
-// export async function addToReadList() {}
-// export async function removeFromReadList() {}
+export async function getUserReadList(): Promise<ReadListBook[]> {
+  const response = await axios.get<GetUserReadListApiResponse>(
+    "/content/users/me/books",
+  );
+
+  const { data, success } = response.data;
+
+  if (!success) {
+    throw new Error("Something went wrong when getting read list");
+  }
+
+  return data.readList;
+}
+
+export async function addToReadList(
+  payload: AddReadListPayload,
+): Promise<LocalBook> {
+  const response = await axios.post<AddToReadListApiResponse>(
+    "/content/users/me/books",
+    payload,
+  );
+
+  const { data, success } = response.data;
+
+  if (!success) {
+    throw new Error("Something went wrong when adding to read list");
+  }
+
+  return data.book;
+}
+
+export async function removeFromReadList(bookId: number) {
+  const response = await axios.delete<ApiResponse>(
+    `/content/users/me/books/${bookId}`,
+  );
+
+  const { success } = response.data;
+
+  if (!success) {
+    throw new Error("Something went wrong when removing from read list");
+  }
+}
