@@ -2,11 +2,11 @@ import axios from "./axios";
 import {
   type Post,
   type EditablePost,
-  type ShareablePost,
-  type Like,
+  type PostInsert,
   type FeedPost,
-} from "../types/Content";
-import type { GoogleBooksApiResponse } from "../types/GoogleBooks";
+} from "~/types/posts";
+import type { Like } from "~/types/likes";
+import type { GoogleBooksApiResponse } from "~/types/books";
 
 export async function getFeed(): Promise<{
   posts: FeedPost[];
@@ -35,7 +35,7 @@ export async function getBookByName(
 
   return data.data;
 }
-export async function sharePost(postData: ShareablePost): Promise<Post> {
+export async function sharePost(postData: PostInsert): Promise<Post> {
   const response = await axios.post("/content/posts", postData);
 
   const data = response.data;

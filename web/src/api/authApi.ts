@@ -1,4 +1,8 @@
-import { type UserSignupData, type UserLoginData } from "../types/User";
+import type {
+  UserSignupData,
+  UserLoginData,
+  GetUserProfileApiResponse,
+} from "~/types/user";
 import axios from "./axios";
 
 export async function login({ email, password }: UserLoginData) {
@@ -41,15 +45,15 @@ export async function signup({
 }
 
 export async function getProfile() {
-  const response = await axios.get("/auth/me");
+  const response = await axios.get<GetUserProfileApiResponse>("/auth/me");
 
-  const data = response.data;
+  const { success, data } = response.data;
 
-  if (!data.success) {
+  if (success) {
     throw new Error("Something went wrong when getting profile");
   }
 
-  return data.data;
+  return data;
 }
 
 export async function logout() {

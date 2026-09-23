@@ -1,16 +1,16 @@
 import { create } from "zustand";
-import type { User } from "../types/User";
+import type { UserProfile } from "~/types/user";
 
 interface UserStore {
   isAuthLoading: boolean;
-  user: User | null;
+  user: UserProfile | null;
   setIsAuthLoading: (isAuthLoading: boolean) => void;
-  setUser: (user: User | null) => void;
+  setUser: (user: UserProfile | null) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
   isAuthLoading: true,
   user: null,
   setIsAuthLoading: (isAuthLoading: boolean) => set({ isAuthLoading }),
-  setUser: (user: User | null) => set({ user }),
+  setUser: (user: UserProfile | null) => set({ user }),
 }));

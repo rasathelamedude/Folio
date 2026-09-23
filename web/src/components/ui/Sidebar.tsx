@@ -8,7 +8,7 @@ import {
   HiOutlinePencilSquare,
 } from "react-icons/hi2";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -19,13 +19,13 @@ const Sidebar = () => {
       <nav className="flex-1 space-y-8">
         {/* Main Section */}
         <div className="space-y-1">
-          <Link
+          <NavLink
             to={"/"}
             className={`flex items-center gap-3 px-3 py-2 ${location.pathname === "/" ? "bg-[#E8F3EF] text-[#2A6B56]" : "text-gray-500"} rounded-lg font-medium transition-colors`}
           >
             <HiOutlineHome className="w-5 h-5" />
             <span className="text-sm">Home</span>
-          </Link>
+          </NavLink>
 
           <Link
             to={"/discover"}

@@ -4,7 +4,7 @@ import {
   type Following,
   type UserAccountUpdate,
   type User,
-} from "../types/User";
+} from "~/types/user";
 
 export async function getUserFollowers(userId: number): Promise<Follower[]> {
   const response = await axios.get(`/users/${userId}/followers`);

@@ -10,7 +10,7 @@ import { BiCommentDetail } from "react-icons/bi";
 import { HiOutlineUsers } from "react-icons/hi2";
 import InputField from "../components/ui/InputField";
 import PasswordField from "../components/ui/PasswordField";
-import type { UserLoginData } from "../types/User";
+import type { UserLoginData } from "~/types/user";
 import { useState } from "react";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { ImSpinner } from "react-icons/im";

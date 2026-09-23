@@ -5,8 +5,7 @@ import AuthLayout from "./layout/AuthLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
-import { useUserStore } from "./store/userStore";
-import { ImSpinner } from "react-icons/im";
+import FallbackSpinner from "./components/common/FallbackSpinner";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
@@ -18,13 +17,8 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 
 function App() {
-  const user = useUserStore((state) => state.user);
-  const isAuthenticated = !!user;
-
   return (
-    <Suspense
-      fallback={<ImSpinner className="animate-spin text-3xl text-[#2A6B56]" />}
-    >
+    <Suspense fallback={<FallbackSpinner />}>
       <Routes>
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
@@ -38,7 +32,7 @@ function App() {
           <Route
             path="/profile"
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
                 <ProfilePage />
               </ProtectedRoute>
             }
