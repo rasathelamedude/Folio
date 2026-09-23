@@ -1,5 +1,5 @@
 import { eq, and, sql, desc, count, ne } from "drizzle-orm";
-import { db } from "../database/db";
+import { db } from "@/database/db";
 import {
   posts,
   comments,
@@ -8,21 +8,18 @@ import {
   users,
   books,
   usersBooks,
-} from "../database/schema";
+} from "@/database/schema";
+import { Post, PostInsert, FeedPost } from "~/types/posts";
+import { PostComments, Comment } from "~/types/comments";
 import {
-  Like,
-  Post,
-  PostInsert,
-  Comment,
-  Follow,
-  FeedPost,
+  GoogleBooksApiResponse,
   LocalBook,
   LocalBookInsert,
-  PostComments,
   TrendingBook,
-} from "../types/Content";
-import { GoogleBooksApiResponse } from "../types/GoogleBooks";
-import { User } from "../types/User";
+} from "~/types/books";
+import { Like } from "~/types/likes";
+import { Follow } from "~/types/follows";
+import { User } from "~/types/user";
 
 export class ContentService {
   private static async getLocalBook(

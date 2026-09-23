@@ -1,6 +1,6 @@
 import { Cookie, Elysia, t } from "elysia";
-import { UserController } from "../controllers/users.controller";
-import { authMiddleware } from "../middleware/auth.middleware";
+import { UserController } from "@/controllers/users.controller";
+import { authMiddleware } from "@/middleware/auth.middleware";
 
 export const userRoutes = new Elysia().group("/api/v1/users", (app) =>
   app

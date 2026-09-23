@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { accessJwtPlugin } from "../lib/accessJwt";
+import { accessJwtPlugin } from "@/lib/accessJwt";
 
 export const authMiddleware = (app: Elysia) =>
   app.use(accessJwtPlugin).derive(async ({ cookie, accessJwt, set }) => {

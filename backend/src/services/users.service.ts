@@ -1,13 +1,13 @@
 import { eq } from "drizzle-orm";
-import { db } from "../database/db";
-import { users, follows } from "../database/schema";
+import { db } from "@/database/db";
+import { users, follows } from "@/database/schema";
 import {
   UserAccountUpdate,
   User,
   UserProfile,
   Follower,
   Following,
-} from "../types/User";
+} from "~/types/user";
 
 export class UserService {
   private static isUserExists = async (userId: number): Promise<boolean> => {

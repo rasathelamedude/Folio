@@ -1,8 +1,8 @@
 import { Elysia, t } from "elysia";
-import { AuthController } from "../controllers/auth.controller";
-import { accessJwtPlugin } from "../lib/accessJwt";
-import { refreshJwtPlugin } from "../lib/refreshJwt";
-import { authMiddleware } from "../middleware/auth.middleware";
+import { AuthController } from "@/controllers/auth.controller";
+import { accessJwtPlugin } from "@/lib/accessJwt";
+import { refreshJwtPlugin } from "@/lib/refreshJwt";
+import { authMiddleware } from "@/middleware/auth.middleware";
 import { Cookie } from "elysia";
 
 enum Client {
@@ -94,7 +94,5 @@ export const authRoutes = new Elysia()
         }),
       )
       .use(authMiddleware)
-      .get("/me", ({ userId }: { userId: number }) =>
-        AuthController.getProfile({ userId }),
-      ),
+      .get("/me", ({ userId }) => AuthController.getProfile({ userId })),
   );

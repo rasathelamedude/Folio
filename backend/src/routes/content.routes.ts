@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
-import { ContentController } from "../controllers/content.controller";
-import { authMiddleware } from "../middleware/auth.middleware";
-import { optionalAuthMiddleware } from "../middleware/optionalAuth.middleware";
+import { ContentController } from "@/controllers/content.controller";
+import { authMiddleware } from "@/middleware/auth.middleware";
+import { optionalAuthMiddleware } from "@/middleware/optionalAuth.middleware";
 
 export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
   app

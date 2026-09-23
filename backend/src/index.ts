@@ -1,10 +1,10 @@
 import { Elysia } from "elysia";
-import { authRoutes } from "./routes/auth.routes";
-import { userRoutes } from "./routes/users.routes";
-import { contentRoutes } from "./routes/content.routes";
+import { authRoutes } from "@/routes/auth.routes";
+import { userRoutes } from "@/routes/users.routes";
+import { contentRoutes } from "@/routes/content.routes";
 import { cors } from "@elysiajs/cors";
 import { cookie } from "@elysiajs/cookie";
-import { HealthController } from "./controllers/health.controller";
+import { HealthController } from "@/controllers/health.controller";
 
 export const app = new Elysia()
   .use(cors())

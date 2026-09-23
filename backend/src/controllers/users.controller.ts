@@ -1,6 +1,6 @@
 import { Cookie } from "elysia";
-import { UserService } from "../services/users.service";
-import { UserAccountUpdate, UserProfile } from "../types/User";
+import { UserService } from "@/services/users.service";
+import { UserAccountUpdate, UserProfile } from "~/types/user";
 
 export class UserController {
   static async deleteAccount({

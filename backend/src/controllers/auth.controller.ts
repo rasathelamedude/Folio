@@ -1,6 +1,6 @@
-import { AuthService } from "../services/auth.service";
-import { User, UserInsert, UserProfile, UserLogin } from "../types/User";
-import { JWTService } from "../lib/accessJwt";
+import { AuthService } from "@/services/auth.service";
+import { User, UserInsert, UserProfile, UserLoginData } from "~/types/user";
+import { JWTService } from "@/lib/accessJwt";
 import { Cookie } from "elysia";
 
 export class AuthController {
@@ -91,7 +91,7 @@ export class AuthController {
     refreshJwt,
     cookie,
   }: {
-    body: UserLogin;
+    body: UserLoginData;
     accessJwt: JWTService;
     refreshJwt: JWTService;
     cookie: {

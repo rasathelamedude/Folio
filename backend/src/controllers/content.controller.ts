@@ -1,17 +1,14 @@
-import { ContentService } from "../services/content.service";
-import {
-  Post,
-  PostInsert,
-  Like,
-  Comment,
-  Follow,
-  FeedPost,
-  PostComments,
-} from "../types/Content";
-import { GoogleBooksApiResponse } from "../types/GoogleBooks";
+import { ContentService } from "@/services/content.service";
+import { Post, PostInsert, FeedPost } from "~/types/posts";
+import { PostComments, Comment } from "~/types/comments";
+import type { Like } from "~/types/likes";
+import { Follow } from "~/types/follows";
+import { GoogleBooksApiResponse } from "~/types/books";
 
 export class ContentController {
-  static async getSuggestedUsers(userId: number | undefined): Promise<Response> {
+  static async getSuggestedUsers(
+    userId: number | undefined,
+  ): Promise<Response> {
     const suggestedUsers = await ContentService.getSuggestedUsers(userId);
 
     const response = {

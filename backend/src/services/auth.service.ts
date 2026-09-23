@@ -1,7 +1,7 @@
-import { users } from "../database/schema";
-import { db } from "../database/db";
+import { users } from "@/database/schema";
+import { db } from "@/database/db";
 import { eq } from "drizzle-orm";
-import { User, UserInsert, UserProfile, UserOAuthSignup } from "../types/User";
+import { User, UserInsert, UserProfile, UserOAuthSignup } from "~/types/user";
 
 export class AuthService {
   static async signup(newUser: UserInsert): Promise<User> {
