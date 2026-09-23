@@ -1,10 +1,12 @@
 CREATE TABLE "books" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "books_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"google_book_id" text NOT NULL,
 	"title" text NOT NULL,
-	"author" text NOT NULL,
+	"author" text[],
 	"description" text,
 	"cover_image_url" text,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "books_google_book_id_unique" UNIQUE("google_book_id")
 );
 --> statement-breakpoint
 CREATE TABLE "comments" (
@@ -37,30 +39,33 @@ CREATE TABLE "likes" (
 CREATE TABLE "posts" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "posts_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"user_id" integer NOT NULL,
-	"book_id" integer NOT NULL,
+	"book_id" integer,
 	"content" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "users_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
-	"name" text,
+	"name" text NOT NULL,
 	"username" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text,
 	"google_id" text,
 	"profile_picture" text,
+	"is_profile_complete" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_username_unique" UNIQUE("username"),
 	CONSTRAINT "users_email_unique" UNIQUE("email"),
-	CONSTRAINT "users_google_id_unique" UNIQUE("google_id")
+	CONSTRAINT "users_google_id_unique" UNIQUE("google_id"),
+	CONSTRAINT "password_or_google_id" CHECK (("users"."password" IS NOT NULL AND "users"."google_id" IS NULL) OR ("users"."password" IS NULL AND "users"."google_id" IS NOT NULL))
 );
 --> statement-breakpoint
 CREATE TABLE "users_books" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "users_books_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"user_id" integer NOT NULL,
 	"book_id" integer NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "unique_user_book" UNIQUE("user_id","book_id")
 );
 --> statement-breakpoint
 ALTER TABLE "comments" ADD CONSTRAINT "comments_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1779565100089,
-      "tag": "0000_nosy_miracleman",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1780307051713,
-      "tag": "0001_glorious_namorita",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1780308876074,
-      "tag": "0002_white_demogoblin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1780413060372,
-      "tag": "0003_misty_amphibian",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1781037578437,
-      "tag": "0004_even_otto_octavius",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1781084204914,
-      "tag": "0005_shiny_namor",
+      "when": 1790155544820,
+      "tag": "0000_unknown_gamora",
       "breakpoints": true
     }
   ]

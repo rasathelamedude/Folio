@@ -1,1 +1,0 @@
-ALTER TABLE "posts" ALTER COLUMN "book_id" DROP NOT NULL;

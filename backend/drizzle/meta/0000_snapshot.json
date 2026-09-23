@@ -1,5 +1,5 @@
 {
-  "id": "a9dbb94e-c73a-4e2d-92f6-19613c601901",
+  "id": "c136af8f-7d08-4cea-92a8-87ead7d48ca0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -25,6 +25,12 @@
             "cycle": false
           }
         },
+        "google_book_id": {
+          "name": "google_book_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "title": {
           "name": "title",
           "type": "text",
@@ -33,9 +39,9 @@
         },
         "author": {
           "name": "author",
-          "type": "text",
+          "type": "text[]",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "description": {
           "name": "description",
@@ -60,7 +66,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "books_google_book_id_unique": {
+          "name": "books_google_book_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "google_book_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -380,7 +394,7 @@
           "name": "book_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "content": {
           "name": "content",
@@ -456,7 +470,7 @@
           "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "username": {
           "name": "username",
@@ -487,6 +501,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "is_profile_complete": {
+          "name": "is_profile_complete",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         },
         "created_at": {
           "name": "created_at",
@@ -523,7 +544,12 @@
         }
       },
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "password_or_google_id": {
+          "name": "password_or_google_id",
+          "value": "(\"users\".\"password\" IS NOT NULL AND \"users\".\"google_id\" IS NULL) OR (\"users\".\"password\" IS NULL AND \"users\".\"google_id\" IS NOT NULL)"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.users_books": {
@@ -597,7 +623,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "unique_user_book": {
+          "name": "unique_user_book",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id",
+            "book_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
