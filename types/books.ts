@@ -21,6 +21,15 @@ export type ReadListBook = {
   addedAt: string;
 };
 
+export interface PostBook {
+  bookId: number | null;
+  googleBookId: string;
+  title: string;
+  authors?: string[];
+  description?: string;
+  coverImageUrl?: string;
+}
+
 export interface GoogleBook {
   id: string;
   volumeInfo: {
@@ -45,8 +54,13 @@ export interface AddReadListPayload {
   coverImageURL?: string;
 }
 
+export interface SharePostPayload {
+  content: string;
+  book?: PostBook;
+}
+
 export interface GoogleBooksApiResponse {
-  items?: GoogleBook[];
+  books?: GoogleBook[];
   totalItems: number;
 }
 

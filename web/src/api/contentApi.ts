@@ -1,10 +1,5 @@
 import axios from "./axios";
-import type {
-  Post,
-  EditablePost,
-  PostInsert,
-  FeedPost,
-} from "~/types/posts";
+import type { Post, EditablePost, PostInsert, FeedPost } from "~/types/posts";
 import type { Like } from "~/types/likes";
 import type {
   AddReadListPayload,

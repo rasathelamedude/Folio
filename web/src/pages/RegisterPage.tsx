@@ -1,4 +1,4 @@
-import { type UserSignupData } from "../types/User";
+import type { UserSignupData } from "~/types/user";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaRegUser, FaRegStar, FaUserFriends } from "react-icons/fa";
@@ -55,25 +55,25 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-8 font-sans">
-      <div className="flex flex-col md:flex-row w-full max-w-275 bg-white rounded-2xl shadow-2xl overflow-hidden min-h-175">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 sm:p-8 font-sans">
+      <div className="flex flex-col md:flex-row w-full max-w-275 bg-background rounded-2xl shadow-2xl overflow-hidden min-h-175">
         {/* Left Light Panel - Register Form */}
         <div className="w-full md:w-7/12 p-8 md:p-12 lg:px-20 flex flex-col justify-center">
           {/* Header */}
           <div className="mb-6">
-            <h2 className="text-4xl font-medium text-gray-900 mb-2">
+            <h2 className="text-4xl font-medium text-foreground mb-2">
               Start your{" "}
-              <span className="font-serif italic text-[#3A7D64]">reading</span>{" "}
+              <span className="font-serif italic text-primary">reading</span>{" "}
               story
             </h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-foreground/75 text-sm">
               Join thousands of readers sharing what they learn.
             </p>
           </div>
 
           {/* Google Sign Up */}
           <button
-            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-xl py-3 hover:bg-gray-50 transition-colors mb-5 text-sm font-medium text-gray-700 shadow-sm cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 bg-background border border-secondary rounded-xl py-3 hover:bg-secondary transition-colors mb-5 text-sm font-medium text-foreground shadow-sm cursor-pointer"
             onClick={handleGoogleSignup}
           >
             <FcGoogle size={24} />
@@ -82,11 +82,11 @@ const RegisterPage = () => {
 
           {/* Divider */}
           <div className="flex items-center my-5">
-            <div className="grow border-t border-gray-200"></div>
-            <span className="mx-4 text-xs text-gray-400">
+            <div className="grow border-t border-secondary"></div>
+            <span className="mx-4 text-xs text-foreground/75">
               or fill in your details
             </span>
-            <div className="grow border-t border-gray-200"></div>
+            <div className="grow border-t border-secondary"></div>
           </div>
 
           {/* Form */}
@@ -101,9 +101,9 @@ const RegisterPage = () => {
                   label="Full name"
                   value={formData.name}
                   icon={
-                    <FaRegUser className="text-gray-600 font-bold text-md" />
+                    <FaRegUser className="text-foreground/75 font-bold text-md" />
                   }
-                  className="w-full pl-10 pr-3 py-2.5 bg-[#FBF9F6] border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3A7D64] focus:border-transparent transition-all placeholder-gray-400"
+                  className="w-full pl-10 pr-3 py-2.5 bg-secondary text-foreground border border-secondary rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-foreground/60"
                   onChange={(e) => handleChange(e)}
                   placeholder="Rasyar S."
                 />
@@ -119,8 +119,10 @@ const RegisterPage = () => {
                   placeholder="rasyar"
                   value={formData.username}
                   label="Username"
-                  icon={<CiAt className="text-gray-600 font-bold text-md" />}
-                  className="w-full pl-9 pr-3 py-2.5 bg-[#FBF9F6] border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3A7D64] focus:border-transparent transition-all placeholder-gray-400"
+                  icon={
+                    <CiAt className="text-foreground/75 font-bold text-md" />
+                  }
+                  className="w-full pl-9 pr-3 py-2.5 bg-secondary text-foreground border border-secondary rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-foreground/60"
                 />
               </div>
             </div>
@@ -133,9 +135,9 @@ const RegisterPage = () => {
               placeholder="you@example.com"
               value={formData.email}
               label="Email address"
-              icon={<CiMail className="text-gray-600 font-bold text-md" />}
+              icon={<CiMail className="text-foreground/75 font-bold text-md" />}
               type="email"
-              className="w-full pl-10 pr-4 py-2.5 bg-[#FBF9F6] border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3A7D64] focus:border-transparent transition-all placeholder-gray-400"
+              className="w-full pl-10 pr-4 py-2.5 bg-secondary text-foreground border border-secondary rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-foreground/60"
             />
 
             {/* Password Input */}
@@ -169,7 +171,7 @@ const RegisterPage = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className={`w-full bg-[#2B614D] hover:bg-[#224e3e] text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4 ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+              className={`w-full bg-primary hover:bg-foreground text-background font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4 ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
             >
               {isPending ? (
                 <>
@@ -187,13 +189,13 @@ const RegisterPage = () => {
 
           {/* Footer Links */}
           <div className="text-center mt-6">
-            <p className="text-[11px] text-gray-400 mb-3">
+            <p className="text-[11px] text-foreground/75 mb-3">
               By creating an account you agree to Folio's{" "}
               <Link
                 to={"/terms"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-gray-600"
+                className="underline hover:text-primary"
               >
                 Terms of Service
               </Link>{" "}
@@ -202,17 +204,17 @@ const RegisterPage = () => {
                 to={"/privacy"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-gray-600"
+                className="underline hover:text-primary"
               >
                 Privacy Policy
               </Link>
               .
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-foreground/75">
               Already a reader?{" "}
               <Link
                 to={"/login"}
-                className="text-[#3A7D64] font-semibold hover:underline"
+                className="text-primary font-semibold hover:underline"
               >
                 Sign in
               </Link>
@@ -221,13 +223,13 @@ const RegisterPage = () => {
         </div>
 
         {/* Right Dark Panel */}
-        <div className="hidden md:flex flex-col w-5/12 bg-[#121212] text-white p-12 relative overflow-hidden">
+        <div className="hidden md:flex flex-col w-5/12 bg-secondary text-foreground p-12 relative overflow-hidden">
           {/* Logo & Subtitle */}
           <div className="mb-16 z-10">
             <h1 className="text-3xl font-serif tracking-wide">
-              <span className="text-[#3A7D64] italic">F</span>olio
+              <span className="text-primary italic">F</span>olio
             </h1>
-            <p className="text-[10px] text-gray-500 tracking-[0.2em] mt-2 font-medium uppercase">
+            <p className="text-[10px] text-foreground/75 tracking-[0.2em] mt-2 font-medium uppercase">
               Where readers think out loud.
             </p>
           </div>
@@ -235,29 +237,29 @@ const RegisterPage = () => {
           {/* Reader's Thought Section */}
           <div className="z-10 mt-4">
             {/* Quote Icon */}
-            <ImQuotesLeft className="w-8 h-8 text-[#3A7D64] mb-4 opacity-80" />
-            <h2 className="text-3xl font-serif italic leading-snug mb-6 text-gray-100">
+            <ImQuotesLeft className="w-8 h-8 text-accent mb-4 opacity-80" />
+            <h2 className="text-3xl font-serif italic leading-snug mb-6 text-foreground">
               Not all readers are leaders, but all leaders are readers.
             </h2>
 
-            <p className="text-gray-400 text-sm flex items-center mb-16">
-              <span className="w-4 h-px bg-gray-600 mr-3"></span>
+            <p className="text-foreground/75 text-sm flex items-center mb-16">
+              <span className="w-4 h-px bg-accent mr-3"></span>
               Harry S. Truman
             </p>
           </div>
 
           {/* Features List */}
-          <ul className="space-y-4 text-sm text-gray-300 z-10">
+          <ul className="space-y-4 text-sm text-foreground z-10">
             <li className="flex items-center gap-3">
-              <IoBookOutline className="w-5 h-5 text-[#3A7D64]" />
+              <IoBookOutline className="w-5 h-5 text-accent" />
               Build your personal reading library
             </li>
             <li className="flex items-center gap-3">
-              <FaRegStar className="w-5 h-5 text-[#3A7D64]" />
+              <FaRegStar className="w-5 h-5 text-accent" />
               Rate and review every book you finish
             </li>
             <li className="flex items-center gap-3">
-              <FaUserFriends className="w-5 h-5 text-[#3A7D64]" />
+              <FaUserFriends className="w-5 h-5 text-accent" />
               Connect with like-minded readers
             </li>
           </ul>

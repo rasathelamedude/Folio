@@ -5,7 +5,7 @@ export type Post = typeof posts.$inferSelect;
 export type PostInsert = {
   content: string;
   book?: {
-    bookId?: number | null;
+    bookId: number | null;
     googleBookId: string;
     title: string;
     authors?: string[];
