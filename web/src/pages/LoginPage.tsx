@@ -50,15 +50,15 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-8 font-sans">
-      <div className="flex flex-col md:flex-row w-full max-w-275 bg-white rounded-2xl shadow-2xl overflow-hidden min-h-175">
-        <div className="hidden md:flex flex-col w-5/12 bg-[#121212] text-white p-12 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 sm:p-8 font-sans">
+      <div className="flex flex-col md:flex-row w-full max-w-275 bg-background rounded-2xl shadow-2xl overflow-hidden min-h-175">
+        <div className="hidden md:flex flex-col w-5/12 bg-secondary text-foreground p-12 relative overflow-hidden">
           {/* Logo & Subtitle */}
           <div className="mb-16 z-10">
             <h1 className="text-3xl font-serif tracking-wide">
-              <span className="text-[#3A7D64] italic">F</span>olio
+              <span className="text-primary italic">F</span>olio
             </h1>
-            <p className="text-[10px] text-gray-500 tracking-[0.2em] mt-2 font-medium uppercase">
+            <p className="text-[10px] text-foreground/75 tracking-[0.2em] mt-2 font-medium uppercase">
               Read. Reflect. Discuss.
             </p>
           </div>
@@ -66,30 +66,30 @@ const LoginPage = () => {
           {/* Reader's Thought Section */}
           <div className="z-10 mt-4">
             {/* Quote Icon */}
-            <ImQuotesLeft className="w-8 h-8 text-[#3A7D64] mb-4 opacity-80" />
-            <h2 className="text-3xl font-serif italic leading-snug mb-6 text-gray-100">
+            <ImQuotesLeft className="w-8 h-8 text-accent mb-4 opacity-80" />
+            <h2 className="text-3xl font-serif italic leading-snug mb-6 text-foreground">
               A reader lives a thousand lives before he dies. The man who never
               reads lives only one.
             </h2>
 
-            <p className="text-gray-400 text-sm flex items-center mb-16">
-              <span className="w-4 h-px bg-gray-600 mr-3"></span>
+            <p className="text-foreground/75 text-sm flex items-center mb-16">
+              <span className="w-4 h-px bg-accent mr-3"></span>
               George R.R. Martin
             </p>
           </div>
 
           {/* Features List */}
-          <ul className="space-y-4 text-sm text-gray-300 z-10">
+          <ul className="space-y-4 text-sm text-foreground z-10">
             <li className="flex items-center gap-3">
-              <HiOutlineLightBulb className="w-6 h-6 text-[#3A7D64]" />
+              <HiOutlineLightBulb className="w-6 h-6 text-accent" />
               Share insights from every chapter
             </li>
             <li className="flex items-center gap-3">
-              <BiCommentDetail className="w-6 h-6 text-[#3A7D64]" />
+              <BiCommentDetail className="w-6 h-6 text-accent" />
               Capture quotes that stayed with you
             </li>
             <li className="flex items-center gap-3">
-              <HiOutlineUsers className="w-6 h-6 text-[#3A7D64]" />
+              <HiOutlineUsers className="w-6 h-6 text-accent" />
               Follow readers who think like you
             </li>
           </ul>
@@ -99,18 +99,18 @@ const LoginPage = () => {
         <div className="w-full md:w-7/12 p-8 md:p-16 lg:px-24 flex flex-col justify-center">
           {/* Header */}
           <div className="mb-8">
-            <h2 className="text-4xl font-medium text-gray-900 mb-2">
+            <h2 className="text-4xl font-medium text-foreground mb-2">
               Sign in to{" "}
-              <span className="font-serif italic text-[#3A7D64]">Folio</span>
+              <span className="font-serif italic text-primary">Folio</span>
             </h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-foreground/75 text-sm">
               Continue your reading journey.
             </p>
           </div>
 
           {/* Google Sign In */}
           <button
-            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 rounded-lg py-3 hover:bg-gray-50 transition-colors mb-6 text-sm font-medium text-gray-700 shadow-sm cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 bg-background border border-secondary rounded-lg py-3 hover:bg-secondary transition-colors mb-6 text-sm font-medium text-foreground shadow-sm cursor-pointer"
             onClick={handleGoogleLogin}
           >
             <FcGoogle className="w-6 h-6" />
@@ -119,11 +119,11 @@ const LoginPage = () => {
 
           {/* Divider */}
           <div className="flex items-center my-6">
-            <div className="grow border-t border-gray-200"></div>
-            <span className="mx-4 text-xs text-gray-400">
+            <div className="grow border-t border-secondary"></div>
+            <span className="mx-4 text-xs text-foreground/75">
               or sign in with email
             </span>
-            <div className="grow border-t border-gray-200"></div>
+            <div className="grow border-t border-secondary"></div>
           </div>
 
           {/* Form */}
@@ -134,11 +134,11 @@ const LoginPage = () => {
               type="email"
               placeholder="you@example.com"
               label="Email address"
-              icon={<CiMail className="w-5 h-5 text-gray-400" />}
+              icon={<CiMail className="w-5 h-5 text-foreground/75" />}
               required
               value={formData.email}
               onChange={handleChange}
-              className="w-full pl-11 pr-4 py-3 bg-[#FBF9F6] border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#3A7D64] focus:border-transparent transition-all placeholder-gray-400"
+              className="w-full pl-11 pr-4 py-3 bg-secondary border border-secondary rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-foreground/60"
             />
 
             {/* Password Input */}
@@ -161,7 +161,7 @@ const LoginPage = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className={`w-full bg-[#2B614D] hover:bg-[#224e3e] text-white font-medium py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4 ${isPending ? "pointer-events-none cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+              className={`w-full bg-primary hover:bg-foreground text-background font-medium py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4 ${isPending ? "pointer-events-none cursor-not-allowed opacity-50" : "cursor-pointer"}`}
             >
               {isPending ? (
                 <>
@@ -181,15 +181,15 @@ const LoginPage = () => {
           <div className="flex justify-between items-center mt-8 text-sm">
             <a
               href="#"
-              className="text-gray-500 hover:text-gray-800 transition-colors"
+              className="text-foreground/75 hover:text-foreground transition-colors"
             >
               Forgot password?
             </a>
-            <p className="text-gray-500">
+            <p className="text-foreground/75">
               No account?{" "}
               <Link
                 to={"/register"}
-                className="text-[#3A7D64] font-semibold hover:underline"
+                className="text-primary font-semibold hover:underline"
               >
                 Create one
               </Link>

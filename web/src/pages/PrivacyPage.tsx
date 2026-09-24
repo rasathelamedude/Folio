@@ -1,21 +1,21 @@
 const PrivacyPage = () => {
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 font-sans flex justify-center">
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 font-sans flex justify-center">
+      <div className="w-full max-w-3xl bg-background rounded-2xl shadow-2xl overflow-hidden">
         {/* Header Section */}
-        <div className="bg-[#121212] px-8 py-12 text-center relative overflow-hidden">
-          <h1 className="text-3xl font-serif tracking-wide text-white relative z-10">
-            Privacy <span className="text-[#3A7D64] italic">Policy</span>
+        <div className="bg-secondary px-8 py-12 text-center relative overflow-hidden">
+          <h1 className="text-3xl font-serif tracking-wide text-foreground relative z-10">
+            Privacy <span className="text-primary italic">Policy</span>
           </h1>
-          <p className="text-gray-400 text-sm mt-3 relative z-10">
+          <p className="text-foreground/75 text-sm mt-3 relative z-10">
             Last updated: {new Date().toLocaleDateString()}
           </p>
         </div>
 
         {/* Content Section */}
-        <div className="px-8 py-10 sm:px-12 text-gray-700 space-y-8 leading-relaxed text-sm sm:text-base">
+        <div className="px-8 py-10 sm:px-12 text-foreground space-y-8 leading-relaxed text-sm sm:text-base">
           <section>
-            <h2 className="text-xl font-medium text-gray-900 mb-3 font-serif">
+            <h2 className="text-xl font-medium text-foreground mb-3 font-serif">
               1. Information We Collect
             </h2>
             <p>
@@ -28,7 +28,7 @@ const PrivacyPage = () => {
           </section>
 
           <section>
-            <h2 className="text-xl font-medium text-gray-900 mb-3 font-serif">
+            <h2 className="text-xl font-medium text-foreground mb-3 font-serif">
               2. How We Use Your Data
             </h2>
             <p>
@@ -36,14 +36,14 @@ const PrivacyPage = () => {
               the Folio experience. It allows you to log in, maintain your
               digital library, and interact with the community.
             </p>
-            <div className="bg-[#FBF9F6] border-l-4 border-[#3A7D64] p-4 mt-4 text-gray-800">
+            <div className="bg-secondary border-l-4 border-accent p-4 mt-4 text-foreground">
               <strong>Our Promise:</strong> We respect your privacy. We do not,
               and will never, sell your personal data to third parties.
             </div>
           </section>
 
           <section>
-            <h2 className="text-xl font-medium text-gray-900 mb-3 font-serif">
+            <h2 className="text-xl font-medium text-foreground mb-3 font-serif">
               3. Data Security
             </h2>
             <p>
@@ -55,7 +55,7 @@ const PrivacyPage = () => {
           </section>
 
           <section>
-            <h2 className="text-xl font-medium text-gray-900 mb-3 font-serif">
+            <h2 className="text-xl font-medium text-foreground mb-3 font-serif">
               4. Your Rights & Account Deletion
             </h2>
             <p>
@@ -66,10 +66,10 @@ const PrivacyPage = () => {
           </section>
 
           {/* Footer Action */}
-          <div className="pt-8 mt-8 border-t border-gray-100 text-center">
+          <div className="pt-8 mt-8 border-t border-secondary text-center">
             <a
               href="/register"
-              className="text-[#3A7D64] font-medium hover:underline inline-flex items-center gap-2"
+              className="text-primary font-medium hover:underline inline-flex items-center gap-2"
             >
               <svg
                 className="w-4 h-4 rotate-180"

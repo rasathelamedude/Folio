@@ -24,14 +24,14 @@ const InputField = ({
   return (
     <div>
       <label
-        className="block text-xs font-medium text-gray-700 mb-1.5"
+        className="block text-xs font-medium text-foreground mb-1.5"
         htmlFor={name}
       >
         {label}
       </label>
 
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-foreground/75">
           {icon}
         </div>
 

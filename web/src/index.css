@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
