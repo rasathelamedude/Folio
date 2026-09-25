@@ -592,7 +592,14 @@ export class ContentService {
           id: posts.id,
           content: posts.content,
           createdAt: posts.createdAt,
-          bookId: posts.bookId,
+          book: {
+            bookId: books.id,
+            googleBookId: books.googleBookId,
+            title: books.title,
+            authors: books.authors,
+            description: books.description,
+            coverImageUrl: books.coverImageURL,
+          },
           author: {
             id: users.id,
             username: users.username,
@@ -621,6 +628,7 @@ export class ContentService {
         })
         .from(posts)
         .innerJoin(users, eq(posts.userId, users.id))
+        .leftJoin(books, eq(posts.bookId, books.id))
         .where(paginationCondition)
         .orderBy(...orderByCondition)
         .limit(20)

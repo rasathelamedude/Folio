@@ -1,5 +1,5 @@
 import { users } from "../backend/src/database/schema";
-import { ApiResponse } from "./api";
+import type { ApiResponse } from "./api";
 
 export type User = typeof users.$inferSelect;
 export type UserInsert = typeof users.$inferInsert;
@@ -32,4 +32,4 @@ export type UserSignupData = Pick<
 
 export type UserLoginData = Pick<User, "email" | "password">;
 
-export type GetUserProfileApiResponse = ApiResponse<UserProfile>;
+export type GetUserProfileApiResponse = ApiResponse<{ user: UserProfile }>;

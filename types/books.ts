@@ -30,6 +30,15 @@ export interface PostBook {
   coverImageUrl?: string;
 }
 
+export type FeedBook = {
+  bookId: number;
+  googleBookId: string;
+  title: string;
+  authors: string[] | null;
+  description: string | null;
+  coverImageUrl: string | null;
+};
+
 export interface GoogleBook {
   id: string;
   volumeInfo: {
@@ -60,7 +69,7 @@ export interface SharePostPayload {
 }
 
 export interface GoogleBooksApiResponse {
-  books?: GoogleBook[];
+  items?: GoogleBook[];
   totalItems: number;
 }
 

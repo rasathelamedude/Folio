@@ -1,4 +1,5 @@
 import { posts } from "../backend/src/database/schema";
+import type { FeedBook } from "./books";
 
 export type Post = typeof posts.$inferSelect;
 
@@ -20,7 +21,7 @@ export type FeedPost = {
   id: number;
   content: string;
   createdAt: Date;
-  bookId: number | null;
+  book: FeedBook | null;
   author: {
     id: number;
     username: string;
