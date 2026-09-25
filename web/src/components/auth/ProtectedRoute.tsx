@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useUserStore } from "../../store/userStore";
-import { ImSpinner } from "react-icons/im";
 import FallbackSpinner from "../common/FallbackSpinner";
 
 interface Props {

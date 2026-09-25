@@ -49,11 +49,11 @@ export async function getProfile() {
 
   const { success, data } = response.data;
 
-  if (success) {
+  if (!success) {
     throw new Error("Something went wrong when getting profile");
   }
 
-  return data;
+  return data.user;
 }
 
 export async function logout() {

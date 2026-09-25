@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { UserProfile } from "~/types/user";
 
 interface UserStore {
@@ -8,9 +9,22 @@ interface UserStore {
   setUser: (user: UserProfile | null) => void;
 }
 
-export const useUserStore = create<UserStore>((set) => ({
-  isAuthLoading: true,
-  user: null,
-  setIsAuthLoading: (isAuthLoading: boolean) => set({ isAuthLoading }),
-  setUser: (user: UserProfile | null) => set({ user }),
-}));
+export const useUserStore = create<UserStore>()(
+  persist(
+    (set) => ({
+      isAuthLoading: true,
+      user: null,
+
+      setIsAuthLoading: (isAuthLoading) => set({ isAuthLoading }),
+      setUser: (user) => set({ user }),
+    }),
+    {
+      name: "folio-user",
+      storage: createJSONStorage(() => sessionStorage),
+
+      partialize: (state) => ({
+        user: state.user,
+      }),
+    },
+  ),
+);
