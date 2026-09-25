@@ -5,17 +5,17 @@ import type {
   AddReadListPayload,
   AddToReadListApiResponse,
   GetUserReadListApiResponse,
-  GoogleBooksApiResponse,
+  GoogleBook,
   LocalBook,
   ReadListBook,
 } from "~/types/books";
 import type { ApiResponse } from "~/types/api";
 
-export async function getFeed(): Promise<{
+export async function getFeed(cursor?: string): Promise<{
   posts: FeedPost[];
-  cursor: string | null;
+  nextCursor: string | null;
 }> {
-  const response = await axios.get("/content/feed");
+  const response = await axios.get("/content/feed", { params: { cursor } });
 
   const data = response.data;
 
@@ -25,10 +25,12 @@ export async function getFeed(): Promise<{
 
   return data.data;
 }
-export async function getBookByName(
-  bookName: string,
-): Promise<GoogleBooksApiResponse> {
-  const response = await axios.get(`/content/books?book_name=${bookName}`);
+export async function getBookByName(bookName: string): Promise<{
+  books: GoogleBook[];
+}> {
+  const response = await axios.get(`/content/books`, {
+    params: { book_name: bookName },
+  });
 
   const data = response.data;
 
@@ -72,11 +74,16 @@ export async function deletePost(postId: number): Promise<boolean> {
 
   return true;
 }
-export async function like(postId?: number, commentId?: number): Promise<Like> {
-  const response = await axios.post("/content/likes", {
-    commentId: commentId !== undefined ? commentId : null,
-    postId: postId !== undefined ? postId : null,
-  });
+export async function like(likeData: {
+  commentId?: number;
+  postId?: number;
+}): Promise<Like> {
+  const payload: { commentId?: number; postId?: number } = {};
+
+  if (likeData.commentId !== undefined) payload.commentId = likeData.commentId;
+  if (likeData.postId !== undefined) payload.postId = likeData.postId;
+
+  const response = await axios.post("/content/likes", payload);
 
   const data = response.data;
 
@@ -86,18 +93,22 @@ export async function like(postId?: number, commentId?: number): Promise<Like> {
 
   return data.data;
 }
-export async function deleteLike(
-  postId?: number,
-  commentId?: number,
-): Promise<boolean> {
-  const hasPostID = postId !== undefined;
-  const hasCommentId = commentId !== undefined;
+export async function deleteLike(likeData: {
+  postId?: number;
+  commentId?: number;
+}): Promise<boolean> {
+  const hasPostId = likeData.postId !== undefined;
+  const hasCommentId = likeData.commentId !== undefined;
 
-  let url: string;
-  if (hasPostID && !hasCommentId) {
-    url = `/content/likes?postID=${postId}`;
-  } else {
-    url = `/content/likes?commentID=${commentId}`;
+  if (hasPostId === hasCommentId) {
+    throw new Error("Provide either postId or commentId, but not both.");
+  }
+
+  let url: string = `/content/likes`;
+  if (hasPostId && !hasCommentId) {
+    url = `/content/likes?postID=${likeData.postId}`;
+  } else if (!hasPostId && hasCommentId) {
+    url = `/content/likes?commentID=${likeData.commentId}`;
   }
 
   const response = await axios.delete(url);
