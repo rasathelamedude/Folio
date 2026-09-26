@@ -54,7 +54,10 @@ export class ContentService {
         title: book.volumeInfo.title,
         authors: book.volumeInfo.authors,
         description: book.volumeInfo.description || null,
-        coverImageURL: book.volumeInfo.imageLinks?.thumbnail || null,
+        coverImageURL:
+          book.volumeInfo.imageLinks?.thumbnail ||
+          book.volumeInfo.imageLinks?.smallThumbnail ||
+          null,
       })
       .returning()
       .execute();
@@ -190,7 +193,6 @@ export class ContentService {
     }
   }
 
-  // TODO:
   static async createPost(postData: PostInsert, userId: number): Promise<Post> {
     try {
       const { content, book } = postData;
