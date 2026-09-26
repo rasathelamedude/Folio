@@ -2,10 +2,10 @@ import axios from "./axios";
 import type { Post, EditablePost, PostInsert, FeedPost } from "~/types/posts";
 import type { Like } from "~/types/likes";
 import type {
-  AddReadListPayload,
   AddToReadListApiResponse,
   GetUserReadListApiResponse,
   GoogleBook,
+  GoogleBookVolume,
   LocalBook,
   ReadListBook,
 } from "~/types/books";
@@ -26,7 +26,7 @@ export async function getFeed(cursor?: string): Promise<{
   return data.data;
 }
 export async function getBookByName(bookName: string): Promise<{
-  books: GoogleBook[];
+  books: GoogleBookVolume[];
 }> {
   const response = await axios.get(`/content/books`, {
     params: { book_name: bookName },
@@ -231,9 +231,7 @@ export async function getUserReadList(): Promise<ReadListBook[]> {
   return data.readList;
 }
 
-export async function addToReadList(
-  payload: AddReadListPayload,
-): Promise<LocalBook> {
+export async function addToReadList(payload: GoogleBook): Promise<LocalBook> {
   const response = await axios.post<AddToReadListApiResponse>(
     "/content/users/me/books",
     payload,

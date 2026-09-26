@@ -1,18 +1,11 @@
 import { posts } from "../backend/src/database/schema";
-import type { FeedBook } from "./books";
+import type { FeedBook, GoogleBook } from "./books";
 
 export type Post = typeof posts.$inferSelect;
 
 export type PostInsert = {
   content: string;
-  book?: {
-    bookId: number | null;
-    googleBookId: string;
-    title: string;
-    authors?: string[];
-    description?: string;
-    coverImageUrl?: string;
-  };
+  book?: GoogleBook;
 };
 
 export type EditablePost = Partial<Pick<Post, "content" | "bookId">>;

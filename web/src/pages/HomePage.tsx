@@ -11,10 +11,11 @@ import {
 import { useId, useState, type FormEvent } from "react";
 import FollowingFeed from "@/components/feed/FollowingFeed";
 import ForYouFeed from "@/components/feed/ForYouFeed";
-import type { PostBook } from "~/types/books";
+import type { GoogleBookVolume } from "~/types/books";
 import type { PostInsert } from "~/types/posts";
 import { ImSpinner } from "react-icons/im";
 import BookPicker from "@/components/common/BookPicker";
+import { simplifyGoogleBook } from "@/lib/books";
 
 type FeedType = "forYou" | "following";
 
@@ -22,7 +23,9 @@ const HomePage = () => {
   const user = useUserStore((state) => state.user);
   const [feedType, setFeedType] = useState<FeedType>("forYou");
   const [content, setContent] = useState("");
-  const [selectedBook, setSelectedBook] = useState<PostBook | null>(null);
+  const [selectedBook, setSelectedBook] = useState<GoogleBookVolume | null>(
+    null,
+  );
   const [isNotLoggedIn, setIsNotLoggedIn] = useState(false);
   const contentId = useId();
   const queryClient = useQueryClient();
@@ -97,7 +100,7 @@ const HomePage = () => {
 
     const payload: PostInsert = { content: content.trim() };
 
-    if (selectedBook) payload.book = selectedBook;
+    if (selectedBook) payload.book = simplifyGoogleBook(selectedBook);
 
     share(payload);
   };

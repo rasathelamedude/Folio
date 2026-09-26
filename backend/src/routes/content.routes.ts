@@ -67,11 +67,21 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
             ContentController.addBookToReadList(userId, body),
           {
             body: t.Object({
-              googleBookId: t.String({ minLength: 1 }),
-              title: t.String({ minLength: 1 }),
-              authors: t.Optional(t.Array(t.String())),
-              description: t.Optional(t.String()),
-              coverImageURL: t.Optional(t.String()),
+              id: t.String(),
+              volumeInfo: t.Object({
+                title: t.String(),
+                authors: t.Optional(t.Array(t.String())),
+                description: t.Optional(t.String()),
+                imageLinks: t.Optional(
+                  t.Object({
+                    thumbnail: t.Optional(t.String()),
+                    smallThumbnail: t.Optional(t.String()),
+                  }),
+                ),
+                categories: t.Optional(t.Array(t.String())),
+                publishedDate: t.Optional(t.String()),
+                pageCount: t.Optional(t.Numeric()),
+              }),
             }),
           },
         )
@@ -93,12 +103,21 @@ export const contentRoutes = new Elysia().group("/api/v1/content", (app) =>
               content: t.String({ minLength: 1 }),
               book: t.Optional(
                 t.Object({
-                  bookId: t.Union([t.Numeric(), t.Null()]),
-                  googleBookId: t.String(),
-                  title: t.String(),
-                  authors: t.Optional(t.ArrayString()),
-                  description: t.Optional(t.String()),
-                  coverImageUrl: t.Optional(t.String()),
+                  id: t.String(),
+                  volumeInfo: t.Object({
+                    title: t.String(),
+                    authors: t.Optional(t.Array(t.String())),
+                    description: t.Optional(t.String()),
+                    imageLinks: t.Optional(
+                      t.Object({
+                        thumbnail: t.Optional(t.String()),
+                        smallThumbnail: t.Optional(t.String()),
+                      }),
+                    ),
+                    categories: t.Optional(t.Array(t.String())),
+                    publishedDate: t.Optional(t.String()),
+                    pageCount: t.Optional(t.Numeric()),
+                  }),
                 }),
               ),
             }),

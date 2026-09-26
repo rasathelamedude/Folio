@@ -3,7 +3,7 @@ import { Post, PostInsert, FeedPost } from "~/types/posts";
 import { PostComments, Comment } from "~/types/comments";
 import type { Like } from "~/types/likes";
 import { Follow } from "~/types/follows";
-import { GoogleBooksApiResponse } from "~/types/books";
+import { GoogleBook, GoogleBooksApiResponse } from "~/types/books";
 
 export class ContentController {
   static async getSuggestedUsers(
@@ -639,13 +639,7 @@ export class ContentController {
 
   static async addBookToReadList(
     userId: number,
-    bookData: {
-      googleBookId: string;
-      title: string;
-      authors?: string[];
-      description?: string;
-      coverImageURL?: string;
-    },
+    bookData: GoogleBook,
   ): Promise<Response> {
     try {
       const book = await ContentService.addBookToReadList(userId, bookData);

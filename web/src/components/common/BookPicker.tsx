@@ -6,33 +6,12 @@ import {
   HiOutlineMagnifyingGlass,
   HiOutlineXMark,
 } from "react-icons/hi2";
-import type { GoogleBook, PostBook } from "~/types/books";
+import type { GoogleBookVolume } from "~/types/books";
 
 interface BookPickerProps {
-  selectedBook: PostBook | null;
-  onSelect: (book: PostBook | null) => void;
+  selectedBook: GoogleBookVolume | null;
+  onSelect: (book: GoogleBookVolume | null) => void;
   disabled?: boolean;
-}
-
-function fromGoogle(book: GoogleBook): PostBook {
-  const result: PostBook = {
-    bookId: null,
-    googleBookId: book.id,
-    title: book.volumeInfo.title,
-  };
-
-  if (book.volumeInfo.authors) result.authors = book.volumeInfo.authors;
-
-  if (book.volumeInfo.description)
-    result.description = book.volumeInfo.description;
-
-  const cover =
-    book.volumeInfo.imageLinks?.thumbnail ??
-    book.volumeInfo.imageLinks?.smallThumbnail;
-
-  if (cover) result.coverImageUrl = cover.replace(/^http:/, "https:");
-
-  return result;
 }
 
 const BookPicker = ({
@@ -69,15 +48,8 @@ const BookPicker = ({
   } = useQuery({
     queryFn: async () => {
       const response = await getBookByName(debouncedSearch);
-      const seen = new Set<string>();
 
-      return response.books
-        .filter((book) => {
-          if (seen.has(book.id)) return false;
-          seen.add(book.id);
-          return true;
-        })
-        .map(fromGoogle);
+      return response.books;
     },
     queryKey: ["post-book-search", debouncedSearch],
     enabled: ready,
@@ -85,7 +57,7 @@ const BookPicker = ({
     retry: 1,
   });
 
-  const selectBook = (book: PostBook) => {
+  const selectBook = (book: GoogleBookVolume) => {
     onSelect(book);
     setIsOpen(false);
     setSearch("");
@@ -94,9 +66,10 @@ const BookPicker = ({
   if (selectedBook) {
     return (
       <div className="flex items-center gap-3 rounded-xl border border-secondary bg-secondary/30 p-3">
-        {selectedBook.coverImageUrl ? (
+        {selectedBook.volumeInfo.imageLinks?.thumbnail ||
+        selectedBook.volumeInfo.imageLinks?.smallThumbnail ? (
           <img
-            src={selectedBook.coverImageUrl}
+            src={selectedBook.volumeInfo.imageLinks?.thumbnail}
             alt=""
             className="h-16 w-11 rounded object-cover"
           />
@@ -108,10 +81,10 @@ const BookPicker = ({
             About this book
           </p>
           <p className="truncate font-serif text-base text-foreground">
-            {selectedBook.title}
+            {selectedBook.volumeInfo.title}
           </p>
           <p className="truncate text-xs text-foreground/75">
-            {selectedBook.authors?.join(", ") || "Unknown author"}
+            {selectedBook.volumeInfo.authors?.join(", ") || "Unknown author"}
           </p>
         </div>
         <button
@@ -188,16 +161,20 @@ const BookPicker = ({
           {ready && isSuccess && (
             <ul className="mt-2 max-h-60 overflow-y-auto">
               {books.map((book) => (
-                <li key={book.googleBookId}>
+                <li key={book.id}>
                   <button
                     type="button"
                     disabled={disabled}
                     onClick={() => selectBook(book)}
                     className="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
-                    {book.coverImageUrl ? (
+                    {book.volumeInfo.imageLinks?.thumbnail ||
+                    book.volumeInfo.imageLinks?.smallThumbnail ? (
                       <img
-                        src={book.coverImageUrl}
+                        src={
+                          book.volumeInfo.imageLinks.thumbnail ||
+                          book.volumeInfo.imageLinks.smallThumbnail
+                        }
                         alt=""
                         className="h-14 w-10 shrink-0 rounded object-cover"
                       />
@@ -206,10 +183,11 @@ const BookPicker = ({
                     )}
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium text-foreground">
-                        {book.title}
+                        {book.volumeInfo.title}
                       </span>
                       <span className="block truncate text-xs text-foreground/75">
-                        {book.authors?.join(", ") || "Unknown author"}
+                        {book.volumeInfo.authors?.join(", ") ||
+                          "Unknown author"}
                       </span>
                     </span>
                     <span className="text-xs text-primary">Select</span>

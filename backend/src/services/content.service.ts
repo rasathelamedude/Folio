@@ -12,6 +12,7 @@ import {
 import { Post, PostInsert, FeedPost } from "~/types/posts";
 import { PostComments, Comment } from "~/types/comments";
 import {
+  GoogleBook,
   GoogleBooksApiResponse,
   LocalBook,
   LocalBookInsert,
@@ -45,17 +46,15 @@ export class ContentService {
     }
   }
 
-  private static async insertLocalBook(
-    book: LocalBookInsert,
-  ): Promise<LocalBook> {
+  private static async insertLocalBook(book: GoogleBook): Promise<LocalBook> {
     const localBook = await db
       .insert(books)
       .values({
-        googleBookId: book.googleBookId,
-        title: book.title,
-        authors: book.authors,
-        description: book.description || null,
-        coverImageURL: book.coverImageURL || null,
+        googleBookId: book.id,
+        title: book.volumeInfo.title,
+        authors: book.volumeInfo.authors,
+        description: book.volumeInfo.description || null,
+        coverImageURL: book.volumeInfo.imageLinks?.thumbnail || null,
       })
       .returning()
       .execute();
@@ -191,13 +190,14 @@ export class ContentService {
     }
   }
 
+  // TODO:
   static async createPost(postData: PostInsert, userId: number): Promise<Post> {
     try {
       const { content, book } = postData;
       let localBook: LocalBook | null = null;
 
-      if (book !== undefined) {
-        localBook = await this.getLocalBook(book.googleBookId);
+      if (book !== undefined && book !== null) {
+        localBook = await this.getLocalBook(book.id);
 
         if (localBook == null) {
           localBook = await this.insertLocalBook(book);
@@ -658,19 +658,11 @@ export class ContentService {
 
   static async addBookToReadList(
     userId: number,
-    bookData: {
-      googleBookId: string;
-      title: string;
-      authors?: string[];
-      description?: string;
-      coverImageURL?: string;
-    },
+    bookData: GoogleBook,
   ): Promise<LocalBook> {
     try {
       // 1. See if the book exists in local db
-      const localBook: LocalBook | null = await this.getLocalBook(
-        bookData.googleBookId,
-      );
+      const localBook: LocalBook | null = await this.getLocalBook(bookData.id);
 
       let bookId: number;
       let newBook: LocalBook | null = null;
